@@ -19,7 +19,13 @@ endif
 "}}}
 
 " commands {{{1
-command! -n=1 EXProject call exproject#open('<args>')
+command! -n=1 -complete=file_in_path EXProject call exproject#open('<args>')
+command! EXProjectClose call exproject#close_window()
+"}}}
+
+" mappings {{{1
+nnoremap <silent> <Plug>ConfirmSelect :call exproject#confirm_select('')<CR>
+nnoremap <silent> <Plug>ShiftConfirmSelect :call exproject#confirm_select('shift')<CR>
 "}}}
 
 " vim:ts=4:sw=4:sts=4 et fdm=marker:
