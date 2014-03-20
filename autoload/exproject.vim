@@ -1,20 +1,13 @@
 " variables {{{1
 let s:cur_project_file = "" 
+
+let s:file_filter = []
+let s:file_ignore_pattern = []
+let s:folder_filter = []
+let s:folder_filter_mode = "include" 
 " }}}
 
 " functions {{{1
-
-" s:init_buffer {{{2
-function! s:init_buffer()
-    " NOTE: this maybe a BUG of Vim.
-    " When I open exproject window and read the file through vimentry scripts,
-    " the events define in exproject/ftdetect/exproject.vim will not execute.
-    " I guess this is because when you are in BufEnter event( the .vimentry
-    " enters ), and open the other buffers, the Vim will not trigger other
-    " buffers' event 
-    " This is why I set the filetype manually here. 
-    set filetype=exproject
-endfunction
 
 " exproject#foldtext {{{2
 function exproject#foldtext()
@@ -54,6 +47,18 @@ function exproject#open(filename)
 endfunction
 
 " exproject#open_window {{{2
+
+function! s:init_buffer()
+    " NOTE: this maybe a BUG of Vim.
+    " When I open exproject window and read the file through vimentry scripts,
+    " the events define in exproject/ftdetect/exproject.vim will not execute.
+    " I guess this is because when you are in BufEnter event( the .vimentry
+    " enters ), and open the other buffers, the Vim will not trigger other
+    " buffers' event 
+    " This is why I set the filetype manually here. 
+    set filetype=exproject
+endfunction
+
 function exproject#open_window()
     call ex#window#open( 
                 \ s:cur_project_file, 
@@ -215,6 +220,176 @@ function exproject#getfoldlevel(linenr) " <<<
     let curline = strpart(curline,0,strridx(curline,'|')+1)
     let str_len = strlen(curline)
     return str_len/2
+endfunction
+
+" exproject#build_tree {{{2
+
+" function s:build_tree(dir, file_filter, dir_filter, filename_list )
+"     " show progress
+"     echon "processing: " . a:dir . "\r"
+
+"     " get short_dir
+"     " let short_dir = strpart( a:dir, strridx(a:dir,'\')+1 )
+"     let short_dir = fnamemodify( a:dir, ":t" )
+
+"     " if directory
+"     if isdirectory(a:dir) == 1
+"         " split the first level to file_list
+"         let file_list = split(globpath(a:dir,'*'),'\n') " NOTE, globpath('.','.*') will show hidden folder
+"         silent call sort( file_list, "exUtility#FileNameSort" )
+
+"         " sort and filter the list as we want (file|dir )
+"         let list_idx = 0
+"         let list_last = len(file_list)-1
+"         let list_count = 0
+"         while list_count <= list_last
+"             if isdirectory(file_list[list_idx]) == 0 " remove not fit file types
+"                 let suffix = fnamemodify ( file_list[list_idx], ":e" ) 
+"                 " move the file to the end of the list
+"                 if ( match ( suffix, a:file_filter ) != -1 ) ||
+"                  \ ( suffix == '' && match ( 'NULL', a:file_filter ) != -1 ) 
+"                     let file = remove(file_list,list_idx)
+"                     silent call add(file_list, file)
+"                 else " if not found file type in file filter
+"                     silent call remove(file_list,list_idx)
+"                 endif
+"                 let list_idx -= 1
+"             elseif a:dir_filter != '' " remove not fit dirs
+"                 if match( file_list[list_idx], a:dir_filter ) == -1 " if not found dir name in dir filter
+"                     silent call remove(file_list,list_idx)
+"                     let list_idx -= 1
+"                 endif
+"             " DISABLE: in our case, globpath never search hidden folder. { 
+"             " elseif len (s:ex_level_list) == 0 " in first level directory, if we .vimfiles* folders, remove them
+"             "     if match( file_list[list_idx], '\<.vimfiles.*' ) != -1
+"             "         silent call remove(file_list,list_idx)
+"             "         let list_idx -= 1
+"             "     endif
+"             " } DISABLE end 
+"             endif
+
+"             "
+"             let list_idx += 1
+"             let list_count += 1
+"         endwhile
+
+"         silent call add(s:ex_level_list, {'is_last':0,'short_dir':short_dir})
+"         " recuseve browse list
+"         let list_last = len(file_list)-1
+"         let list_idx = list_last
+"         let s:ex_level_list[len(s:ex_level_list)-1].is_last = 1
+"         while list_idx >= 0
+"             if list_idx != list_last
+"                 let s:ex_level_list[len(s:ex_level_list)-1].is_last = 0
+"             endif
+"             if s:build_tree(file_list[list_idx],a:file_filter,'',a:filename_list) == 1 " if it is empty
+"                 silent call remove(file_list,list_idx)
+"                 let list_last = len(file_list)-1
+"             endif
+"             let list_idx -= 1
+"         endwhile
+
+"         silent call remove( s:ex_level_list, len(s:ex_level_list)-1 )
+
+"         if len(file_list) == 0
+"             return 1
+"         endif
+"     endif
+
+"     " write space
+"     let space = ''
+"     let list_idx = 0
+"     let list_last = len(s:ex_level_list)-1
+"     for level in s:ex_level_list
+"         if level.is_last != 0 && list_idx != list_last
+"             let space = space . '  '
+"         else
+"             let space = space . ' |'
+"         endif
+"         let list_idx += 1
+"     endfor
+"     let space = space.'-'
+
+"     " get end_fold
+"     let end_fold = ''
+"     let rev_list = reverse(copy(s:ex_level_list))
+"     for level in rev_list
+"         if level.is_last != 0
+"             let end_fold = end_fold . ' }'
+"         else
+"             break
+"         endif
+"     endfor
+
+"     " judge if it is a dir
+"     if isdirectory(a:dir) == 0
+"         " if file_end enter a new line for it
+"         if end_fold != ''
+"             let end_space = strpart(space,0,strridx(space,'-')-1)
+"             let end_space = strpart(end_space,0,strridx(end_space,'|')+1)
+"             silent put! = end_space " . end_fold
+"         endif
+"         " put it
+"         " let file_type = strpart( short_dir, strridx(short_dir,'.')+1, 1 )
+"         let file_type = strpart( fnamemodify( short_dir, ":e" ), 0, 1 )
+"         silent put! = space.'['.file_type.']'.short_dir . end_fold
+
+"         " add file with full path as tag contents
+"         let filename_path = exUtility#Pathfmt(fnamemodify(a:dir,':.'),'unix')
+"         silent call add ( a:filename_list, short_dir."\t".'../'.filename_path."\t1" )
+"         " KEEPME: we don't use this method now { 
+"         " silent call add ( a:filename_list[1], './'.filename_path )
+"         " silent call add ( a:filename_list[2], '../'.filename_path )
+"         " } KEEPME end 
+"         return 0
+"     else
+
+"         "silent put = strpart(space, 0, strridx(space,'\|-')+1)
+"         if len(file_list) == 0 " if it is a empty directory
+"             if end_fold == ''
+"                 " if dir_end enter a new line for it
+"                 let end_space = strpart(space,0,strridx(space,'-'))
+"             else
+"                 " if dir_end enter a new line for it
+"                 let end_space = strpart(space,0,strridx(space,'-')-1)
+"                 let end_space = strpart(end_space,0,strridx(end_space,'|')+1)
+"             endif
+"             let end_fold = end_fold . ' }'
+"             silent put! = end_space
+"             silent put! = space.'[F]'.short_dir . ' {' . end_fold
+"         else
+"             silent put! = space.'[F]'.short_dir . ' {'
+"         endif
+"     endif
+
+"     return 0
+" endfunction
+
+function exproject#build_tree()
+    " TODO: call exUtility#SetLevelList(-1, 1)
+
+    " get entry dir
+    let entry_dir = getcwd()
+    if exists('g:ex_cwd')
+        let entry_dir = g:ex_cwd
+    endif
+
+    echo "Creating ex_project: " . entry_dir . "\r"
+    silent exec '1,$d _'
+
+    " TODO:
+    " let filename_list = []
+    " let project_file_filter = exUtility#GetProjectFilter ( "file_filter" )
+    " let project_dir_filter = exUtility#GetProjectFilter ( "dir_filter" )
+    " call s:build_tree( 
+    "             \ entry_dir, 
+    "             \ exUtility#GetFileFilterPattern(project_file_filter), 
+    "             \ exUtility#GetDirFilterPattern(project_dir_filter), 
+    "             \ filename_list )
+
+    "
+    silent keepjumps normal! gg
+    echo "ex_project: " . entry_dir . " created!\r"
 endfunction
 
 " }}}1
