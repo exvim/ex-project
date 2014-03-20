@@ -120,11 +120,11 @@ function exproject#confirm_select(modifier) " <<<
     silent call cursor(cursor_line,cursor_col)
 
     " simplify the file name
-    let fullpath = fnamemodify( fullpath, ":p" )
+    let fullpath = fnamemodify( fullpath, ':p' )
     let fullpath = escape(fullpath,' ')
 
     " switch filetype
-    let filetype = fnamemodify( fullpath, ":e" )
+    let filetype = fnamemodify( fullpath, ':e' )
     if filetype == 'err'
         " TODO:
         " call ex#hint('load quick fix list: ' . fullpath)
@@ -140,14 +140,15 @@ function exproject#confirm_select(modifier) " <<<
         return
     else " default
         " put the edit file
-        call ex#hint( fnamemodify(fullpath, ":p:.") )
+        call ex#hint(fnamemodify(fullpath, ':p:.'))
 
-        " TODO:
-        " call exUtility#GotoEditBuffer()
-        " " do not open again if the current buf is the file to be opened
-        " if fnamemodify(expand("%"),":p") != fnamemodify(fullpath,":p")
-        "     silent exec editcmd.' '.fullpath
-        " endif
+        " goto edit window
+        call ex#window#goto_edit_window()
+
+        " do not open again if the current buffer is the file to be opened
+        if fnamemodify(expand('%'),':p') != fnamemodify(fullpath,':p')
+            silent exec editcmd.' '.fullpath
+        endif
     endif
 
     " TODO:
