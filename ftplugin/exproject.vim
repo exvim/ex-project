@@ -24,9 +24,9 @@ nmap <buffer> <2-LeftMouse> <Plug>ConfirmSelect
 nmap <buffer> <S-Return> <Plug>ShiftConfirmSelect
 nmap <buffer> <S-2-LeftMouse> <Plug>ShiftConfirmSelect
 
-nnoremap <silent> <buffer> <localleader>R    :EXProjectBuild<CR>
-" nnoremap <silent> <buffer> <localleader>r    :call <SID>exPJ_RefreshProject(0)<CR>
-" nnoremap <silent> <buffer> <localleader>e    :call <SID>exPJ_EchoPath()<CR>
+nnoremap <silent> <buffer> <leader>R    :EXProjectBuild<CR>
+" nnoremap <silent> <buffer> <leader>r    :call <SID>exPJ_RefreshProject(0)<CR>
+" nnoremap <silent> <buffer> <leader>e    :call <SID>exPJ_EchoPath()<CR>
 
 " "
 " nnoremap <silent> <buffer> <c-up> :call exUtility#CursorJump( 'ErrorLog.err', 'up' )<CR>
@@ -40,13 +40,8 @@ nnoremap <silent> <buffer> <localleader>R    :EXProjectBuild<CR>
 " nnoremap <silent> <buffer> O  :call <SID>exPJ_CreateNewFold()<CR>
 " }}}1
 
-" " Autocommands to keep the window the specified size
-" au WinLeave <buffer> :call s:exPJ_RefreshWindow()
-" au BufWritePost <buffer> :call s:exPJ_UpdateFilters()
-" " au CursorMoved <buffer> :call exUtility#HighlightSelectLine()
+" auto command {{{1
 " au CursorHold <buffer> :call s:exPJ_EchoPath()
-
-" " init filter variables
-" call s:exPJ_UpdateFilters ()
+" }}}1
 
 " vim:ts=4:sw=4:sts=4 et fdm=marker:
