@@ -19,7 +19,7 @@ endif
 "}}}
 
 " commands {{{1
-command! -n=1 -complete=file_in_path EXProject call exproject#open('<args>')
+command! -n=1 -complete=file EXProject call exproject#open('<args>')
 command! EXProjectClose call exproject#close_window()
 "}}}
 
