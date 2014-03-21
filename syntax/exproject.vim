@@ -5,6 +5,7 @@ elseif exists("b:current_syntax")
 endif
 
 " syntax highlight
+syn match ex_pj_help #^".*#
 syntax match ex_pj_fold_start '{'
 syntax match ex_pj_fold_end '}'
 syntax match ex_pj_tree_line '\( |\)\+-*\ze'
@@ -28,6 +29,7 @@ syntax match ex_pj_error_file_name '\(\[e\]\)\@<=\S.*' contains=ex_pj_fold_start
 hi link ex_pj_fold_start exTransparent
 hi link ex_pj_fold_end exTransparent
 
+hi link ex_pj_help Comment
 hi link ex_pj_tree_line Comment
 " hi link ex_pj_filter Constant
 

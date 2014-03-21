@@ -15,8 +15,8 @@ silent! setlocal statusline=
 " }}}1
 
 " Key Mappings {{{1
-" nnoremap <buffer> <silent> <ESC> :EXProjectClose<CR>
-" nnoremap <buffer> <silent> <Space> :EXProjectToggleZoom<CR>
+" nnoremap <silent> <buffer> <ESC> :EXProjectClose<CR>
+nnoremap <silent> <buffer> <Space> :call exproject#toggle_zoom()<CR>
 
 nmap <buffer> <CR> <Plug>ConfirmSelect
 nmap <buffer> <2-LeftMouse> <Plug>ConfirmSelect
@@ -24,9 +24,7 @@ nmap <buffer> <2-LeftMouse> <Plug>ConfirmSelect
 nmap <buffer> <S-Return> <Plug>ShiftConfirmSelect
 nmap <buffer> <S-2-LeftMouse> <Plug>ShiftConfirmSelect
 
-" nnoremap <silent> <buffer> <localleader>C    :call <SID>exPJ_CreateProject(1)<CR>
-" nnoremap <silent> <buffer> <localleader>cf   :call <SID>exPJ_RefreshProject(1)<CR>
-" nnoremap <silent> <buffer> <localleader>R    :call <SID>exPJ_CreateProject(0)<CR>
+nnoremap <silent> <buffer> <localleader>R    :EXProjectBuild<CR>
 " nnoremap <silent> <buffer> <localleader>r    :call <SID>exPJ_RefreshProject(0)<CR>
 " nnoremap <silent> <buffer> <localleader>e    :call <SID>exPJ_EchoPath()<CR>
 

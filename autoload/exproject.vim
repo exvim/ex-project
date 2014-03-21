@@ -5,6 +5,8 @@ let s:file_filter = []
 let s:file_ignore_pattern = []
 let s:folder_filter = []
 let s:folder_filter_mode = "include" 
+
+let s:zoom_in = 0
 " }}}
 
 " functions {{{1
@@ -38,12 +40,7 @@ function exproject#open(filename)
     endif
 
     " open and goto the window
-    let winnr = bufwinnr(s:cur_project_file)
-    if winnr == -1
-        call exproject#open_window()
-    else
-        exe winnr . 'wincmd w'
-    endif
+    call exproject#open_window()
 endfunction
 
 " exproject#open_window {{{2
@@ -60,14 +57,19 @@ function! s:init_buffer()
 endfunction
 
 function exproject#open_window()
-    call ex#window#open( 
-                \ s:cur_project_file, 
-                \ g:ex_project_winsize,
-                \ g:ex_project_winpos,
-                \ 0,
-                \ 1,
-                \ function('s:init_buffer')
-                \ )
+    let winnr = bufwinnr(s:cur_project_file)
+    if winnr == -1
+        call ex#window#open( 
+                    \ s:cur_project_file, 
+                    \ g:ex_project_winsize,
+                    \ g:ex_project_winpos,
+                    \ 0,
+                    \ 1,
+                    \ function('s:init_buffer')
+                    \ )
+    else
+        exe winnr . 'wincmd w'
+    endif
 endfunction
 
 " exproject#toggle_widnow {{{2
@@ -93,7 +95,7 @@ endfunction
 " exproject#confirm_select {{{2
 " modifier: '' or 'shift'
 
-function exproject#confirm_select(modifier) " <<<
+function exproject#confirm_select(modifier)
     " check if the line is valid file line
     let curline = getline('.') 
     if match(curline, '\C\[.*\]') == -1
@@ -163,9 +165,9 @@ endfunction
 
 " exproject#search_for_pattern {{{2
 function exproject#search_for_pattern( linenr, pattern )
-    for linenum in range(a:linenr , 1 , -1)
-        if match( getline(linenum) , a:pattern ) != -1
-            return linenum
+    for linenr in range(a:linenr , 1 , -1)
+        if match( getline(linenr) , a:pattern ) != -1
+            return linenr
         endif
     endfor
     return 0
@@ -215,7 +217,7 @@ function exproject#getpath( linenr )
 endfunction
 
 " exproject#getfoldlevel {{{2
-function exproject#getfoldlevel(linenr) " <<<
+function exproject#getfoldlevel(linenr)
     let curline = getline(a:linenr)
     let curline = strpart(curline,0,strridx(curline,'|')+1)
     let str_len = strlen(curline)
@@ -224,149 +226,168 @@ endfunction
 
 " exproject#build_tree {{{2
 
-" function s:build_tree(dir, file_filter, dir_filter, filename_list )
-"     " show progress
-"     echon "processing: " . a:dir . "\r"
+function s:set_level_list( linenr )
+    " clean the list
+    let s:level_list = []
 
-"     " get short_dir
-"     " let short_dir = strpart( a:dir, strridx(a:dir,'\')+1 )
-"     let short_dir = fnamemodify( a:dir, ":t" )
+    let cur_line = getline(a:linenr+1)
+    let idx = strridx(cur_line, '|') -2
+    let cur_line = strpart(cur_line, 1, idx)
 
-"     " if directory
-"     if isdirectory(a:dir) == 1
-"         " split the first level to file_list
-"         let file_list = split(globpath(a:dir,'*'),'\n') " NOTE, globpath('.','.*') will show hidden folder
-"         silent call sort( file_list, "exUtility#FileNameSort" )
+    let len = strlen(cur_line)
+    let idx = 0
+    while idx <= len
+        if cur_line[idx] == '|'
+            silent call add( s:level_list, {'is_last':0,'short_dir':''} )
+        else
+            silent call add( s:level_list, {'is_last':1,'short_dir':''} )
+        endif
+        let idx += 2
+    endwhile
+endfunction
 
-"         " sort and filter the list as we want (file|dir )
-"         let list_idx = 0
-"         let list_last = len(file_list)-1
-"         let list_count = 0
-"         while list_count <= list_last
-"             if isdirectory(file_list[list_idx]) == 0 " remove not fit file types
-"                 let suffix = fnamemodify ( file_list[list_idx], ":e" ) 
-"                 " move the file to the end of the list
-"                 if ( match ( suffix, a:file_filter ) != -1 ) ||
-"                  \ ( suffix == '' && match ( 'NULL', a:file_filter ) != -1 ) 
-"                     let file = remove(file_list,list_idx)
-"                     silent call add(file_list, file)
-"                 else " if not found file type in file filter
-"                     silent call remove(file_list,list_idx)
-"                 endif
-"                 let list_idx -= 1
-"             elseif a:dir_filter != '' " remove not fit dirs
-"                 if match( file_list[list_idx], a:dir_filter ) == -1 " if not found dir name in dir filter
-"                     silent call remove(file_list,list_idx)
-"                     let list_idx -= 1
-"                 endif
-"             " DISABLE: in our case, globpath never search hidden folder. { 
-"             " elseif len (s:ex_level_list) == 0 " in first level directory, if we .vimfiles* folders, remove them
-"             "     if match( file_list[list_idx], '\<.vimfiles.*' ) != -1
-"             "         silent call remove(file_list,list_idx)
-"             "         let list_idx -= 1
-"             "     endif
-"             " } DISABLE end 
-"             endif
+function s:sort_filename( i1, i2 )
+    return a:i1 ==? a:i2 ? 0 : a:i1 >? a:i2 ? 1 : -1
+endfunction
 
-"             "
-"             let list_idx += 1
-"             let list_count += 1
-"         endwhile
+function s:build_tree(entry_path, file_filter, folder_filter, filename_list )
+    " show progress
+    echon 'processing: ' . fnamemodify(a:entry_path, ':p:.') . "\r"
 
-"         silent call add(s:ex_level_list, {'is_last':0,'short_dir':short_dir})
-"         " recuseve browse list
-"         let list_last = len(file_list)-1
-"         let list_idx = list_last
-"         let s:ex_level_list[len(s:ex_level_list)-1].is_last = 1
-"         while list_idx >= 0
-"             if list_idx != list_last
-"                 let s:ex_level_list[len(s:ex_level_list)-1].is_last = 0
-"             endif
-"             if s:build_tree(file_list[list_idx],a:file_filter,'',a:filename_list) == 1 " if it is empty
-"                 silent call remove(file_list,list_idx)
-"                 let list_last = len(file_list)-1
-"             endif
-"             let list_idx -= 1
-"         endwhile
+    " get short_dir
+    " let short_dir = strpart( a:entry_path, strridx(a:entry_path,'\')+1 )
+    let short_dir = fnamemodify( a:entry_path, ':t' )
 
-"         silent call remove( s:ex_level_list, len(s:ex_level_list)-1 )
+    " if directory
+    if isdirectory(a:entry_path) == 1
+        " split the first level to file_list
+        let file_list = split(globpath(a:entry_path,'*'),'\n') " NOTE, globpath('.','.*') will show hidden folder
+        silent call sort( file_list, function('s:sort_filename') )
 
-"         if len(file_list) == 0
-"             return 1
-"         endif
-"     endif
+        " sort and filter the list as we want (file|dir )
+        let list_idx = 0
+        let list_last = len(file_list)-1
+        let list_count = 0
+        while list_count <= list_last
+            if isdirectory(file_list[list_idx]) == 0 " remove not fit file types
+                let suffix = fnamemodify ( file_list[list_idx], ':e' ) 
+                " move the file to the end of the list
+                if ( match ( suffix, a:file_filter ) != -1 ) ||
+                 \ ( suffix == '' && match ( 'NULL', a:file_filter ) != -1 ) 
+                    let file = remove(file_list,list_idx)
+                    silent call add(file_list, file)
+                else " if not found file type in file filter
+                    silent call remove(file_list,list_idx)
+                endif
+                let list_idx -= 1
+            elseif a:folder_filter != '' " remove not fit dirs
+                if match( file_list[list_idx], a:folder_filter ) == -1 " if not found dir name in dir filter
+                    silent call remove(file_list,list_idx)
+                    let list_idx -= 1
+                endif
+            " DISABLE: in our case, globpath never search hidden folder. { 
+            " elseif len (s:level_list) == 0 " in first level directory, if we .vimfiles* folders, remove them
+            "     if match( file_list[list_idx], '\<.vimfiles.*' ) != -1
+            "         silent call remove(file_list,list_idx)
+            "         let list_idx -= 1
+            "     endif
+            " } DISABLE end 
+            endif
 
-"     " write space
-"     let space = ''
-"     let list_idx = 0
-"     let list_last = len(s:ex_level_list)-1
-"     for level in s:ex_level_list
-"         if level.is_last != 0 && list_idx != list_last
-"             let space = space . '  '
-"         else
-"             let space = space . ' |'
-"         endif
-"         let list_idx += 1
-"     endfor
-"     let space = space.'-'
+            "
+            let list_idx += 1
+            let list_count += 1
+        endwhile
 
-"     " get end_fold
-"     let end_fold = ''
-"     let rev_list = reverse(copy(s:ex_level_list))
-"     for level in rev_list
-"         if level.is_last != 0
-"             let end_fold = end_fold . ' }'
-"         else
-"             break
-"         endif
-"     endfor
+        silent call add(s:level_list, {'is_last':0,'short_dir':short_dir})
+        " recuseve browse list
+        let list_last = len(file_list)-1
+        let list_idx = list_last
+        let s:level_list[len(s:level_list)-1].is_last = 1
+        while list_idx >= 0
+            if list_idx != list_last
+                let s:level_list[len(s:level_list)-1].is_last = 0
+            endif
+            if s:build_tree(file_list[list_idx],a:file_filter,'',a:filename_list) == 1 " if it is empty
+                silent call remove(file_list,list_idx)
+                let list_last = len(file_list)-1
+            endif
+            let list_idx -= 1
+        endwhile
 
-"     " judge if it is a dir
-"     if isdirectory(a:dir) == 0
-"         " if file_end enter a new line for it
-"         if end_fold != ''
-"             let end_space = strpart(space,0,strridx(space,'-')-1)
-"             let end_space = strpart(end_space,0,strridx(end_space,'|')+1)
-"             silent put! = end_space " . end_fold
-"         endif
-"         " put it
-"         " let file_type = strpart( short_dir, strridx(short_dir,'.')+1, 1 )
-"         let file_type = strpart( fnamemodify( short_dir, ":e" ), 0, 1 )
-"         silent put! = space.'['.file_type.']'.short_dir . end_fold
+        silent call remove( s:level_list, len(s:level_list)-1 )
 
-"         " add file with full path as tag contents
-"         let filename_path = exUtility#Pathfmt(fnamemodify(a:dir,':.'),'unix')
-"         silent call add ( a:filename_list, short_dir."\t".'../'.filename_path."\t1" )
-"         " KEEPME: we don't use this method now { 
-"         " silent call add ( a:filename_list[1], './'.filename_path )
-"         " silent call add ( a:filename_list[2], '../'.filename_path )
-"         " } KEEPME end 
-"         return 0
-"     else
+        if len(file_list) == 0
+            return 1
+        endif
+    endif
 
-"         "silent put = strpart(space, 0, strridx(space,'\|-')+1)
-"         if len(file_list) == 0 " if it is a empty directory
-"             if end_fold == ''
-"                 " if dir_end enter a new line for it
-"                 let end_space = strpart(space,0,strridx(space,'-'))
-"             else
-"                 " if dir_end enter a new line for it
-"                 let end_space = strpart(space,0,strridx(space,'-')-1)
-"                 let end_space = strpart(end_space,0,strridx(end_space,'|')+1)
-"             endif
-"             let end_fold = end_fold . ' }'
-"             silent put! = end_space
-"             silent put! = space.'[F]'.short_dir . ' {' . end_fold
-"         else
-"             silent put! = space.'[F]'.short_dir . ' {'
-"         endif
-"     endif
+    " write space
+    let space = ''
+    let list_idx = 0
+    let list_last = len(s:level_list)-1
+    for level in s:level_list
+        if level.is_last != 0 && list_idx != list_last
+            let space = space . '  '
+        else
+            let space = space . ' |'
+        endif
+        let list_idx += 1
+    endfor
+    let space = space.'-'
 
-"     return 0
-" endfunction
+    " get end_fold
+    let end_fold = ''
+    let rev_list = reverse(copy(s:level_list))
+    for level in rev_list
+        if level.is_last != 0
+            let end_fold = end_fold . ' }'
+        else
+            break
+        endif
+    endfor
+
+    " judge if it is a dir
+    if isdirectory(a:entry_path) == 0
+        " if file_end enter a new line for it
+        if end_fold != ''
+            let end_space = strpart(space,0,strridx(space,'-')-1)
+            let end_space = strpart(end_space,0,strridx(end_space,'|')+1)
+            silent put! = end_space " . end_fold
+        endif
+        " put it
+        " let file_type = strpart( short_dir, strridx(short_dir,'.')+1, 1 )
+        let file_type = strpart( fnamemodify( short_dir, ":e" ), 0, 1 )
+        silent put! = space.'['.file_type.']'.short_dir . end_fold
+
+        " add file with full path as tag contents
+        let filename_path = ex#path#translate(fnamemodify(a:entry_path,':.'),'unix')
+        silent call add ( a:filename_list, short_dir."\t".'../'.filename_path."\t1" )
+    else
+
+        "silent put = strpart(space, 0, strridx(space,'\|-')+1)
+        if len(file_list) == 0 " if it is a empty directory
+            if end_fold == ''
+                " if dir_end enter a new line for it
+                let end_space = strpart(space,0,strridx(space,'-'))
+            else
+                " if dir_end enter a new line for it
+                let end_space = strpart(space,0,strridx(space,'-')-1)
+                let end_space = strpart(end_space,0,strridx(end_space,'|')+1)
+            endif
+            let end_fold = end_fold . ' }'
+            silent put! = end_space
+            silent put! = space.'[F]'.short_dir . ' {' . end_fold
+        else
+            silent put! = space.'[F]'.short_dir . ' {'
+        endif
+    endif
+
+    return 0
+endfunction
 
 function exproject#build_tree()
-    " TODO: call exUtility#SetLevelList(-1, 1)
+    let s:level_list = [] " init level list
 
     " get entry dir
     let entry_dir = getcwd()
@@ -374,22 +395,103 @@ function exproject#build_tree()
         let entry_dir = g:ex_cwd
     endif
 
-    echo "Creating ex_project: " . entry_dir . "\r"
+    echon 'Creating ex_project: ' . entry_dir . "\r"
     silent exec '1,$d _'
 
-    " TODO:
-    " let filename_list = []
-    " let project_file_filter = exUtility#GetProjectFilter ( "file_filter" )
-    " let project_dir_filter = exUtility#GetProjectFilter ( "dir_filter" )
-    " call s:build_tree( 
-    "             \ entry_dir, 
-    "             \ exUtility#GetFileFilterPattern(project_file_filter), 
-    "             \ exUtility#GetDirFilterPattern(project_dir_filter), 
-    "             \ filename_list )
+    " start tree building
+    let filename_list = []
+    let file_filter_pattern = '' " TODO: initialize through s:file_filter 
+    let foder_filter_patern = '' " TODO: initialize through s:folder_filter 
+    call s:build_tree( 
+                \ entry_dir, 
+                \ file_filter_pattern, 
+                \ foder_filter_patern, 
+                \ filename_list )
 
-    "
     silent keepjumps normal! gg
-    echo "ex_project: " . entry_dir . " created!\r"
+
+    " TODO: add online help 
+    silent call append ( 0, [
+                \ '" Press ? for help',
+                \ '',
+                \ ] )
+
+    " save the build
+    silent exec 'w!'
+    echon 'ex_project: ' . entry_dir . ' created!' . "\r"
+endfunction
+
+" exproject#find_current_edit {{{2
+function exproject#find_current_edit( focus )
+    " first jump to edit window
+    call ex#window#goto_edit_window()
+
+    " get current buffer name then jump
+    let bufname = bufname('%')
+    let cur_filename = fnamemodify(bufname, ':t')
+    let cur_filepath = fnamemodify(bufname, ':p')
+
+    " go to the project window
+    call exproject#open_window()
+
+    " store position if we don't find, restore to the position
+    let cursor_line = line ('.')
+    let cursor_col = col ('.')
+
+    " now go to the top start search
+    silent normal gg
+
+    " process search
+    let found = 0
+    while !found
+        if search( cur_filename, 'W' ) > 0
+            let linenr = line ('.')
+            let searchfilename = exproject#getpath(linenr) . exproject#getname(linenr)
+            if fnamemodify(searchfilename , ':p') == cur_filepath
+                silent call cursor(linenr, 0)
+
+                " unfold the line if it's folded
+                silent normal! zv
+
+                " if find, set the text line in the middel of the window
+                silent normal! zz
+
+                "
+                let found = 1
+                echon 'Locate file: ' . bufname . "\r"
+                break
+            endif
+
+        " if file not found, warning and back to edit window regardless a:focus
+        else
+            silent call cursor ( cursor_line, cursor_col )
+            call ex#warning('File not found: ' . fnamemodify(cur_filepath, ':p:.') )
+            call ex#window#goto_edit_window()
+            return
+        endif
+    endwhile
+
+    " back to edit buffer if needed
+    if !a:focus
+        call ex#window#goto_edit_window()
+    endif
+endfunction
+
+" exproject#toggle_zoom {{{2
+function exproject#toggle_zoom()
+    if s:cur_project_file != ""
+        let winnr = bufwinnr(s:cur_project_file)
+        if winnr != -1
+            if s:zoom_in == 0
+                let s:zoom_in = 1
+                call ex#window#resize( winnr, g:ex_project_winpos, g:ex_project_winsize_zoom )
+            else
+                let s:zoom_in = 0
+                call ex#window#resize( winnr, g:ex_project_winpos, g:ex_project_winsize )
+            endif
+        endif
+    endif
+
 endfunction
 
 " }}}1
