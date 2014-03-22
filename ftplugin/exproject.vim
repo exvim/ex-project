@@ -25,7 +25,7 @@ nmap <buffer> <S-Return> <Plug>ShiftConfirmSelect
 nmap <buffer> <S-2-LeftMouse> <Plug>ShiftConfirmSelect
 
 nnoremap <silent> <buffer> <leader>R    :EXProjectBuild<CR>
-" nnoremap <silent> <buffer> <leader>r    :call <SID>exPJ_RefreshProject(0)<CR>
+nnoremap <silent> <buffer> <leader>r    :EXProjectRefresh<CR>
 " nnoremap <silent> <buffer> <leader>e    :call <SID>exPJ_EchoPath()<CR>
 
 " "

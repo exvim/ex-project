@@ -9,162 +9,10 @@ let s:folder_filter_mode = "include"
 let s:zoom_in = 0
 " }}}
 
-" functions {{{1
+" internal functions {{{1
 
-" exproject#foldtext {{{2
-function exproject#foldtext()
-    let line = getline(v:foldstart)
-    let line = substitute(line,'\[F\]\(.\{-}\) {.*','\[+\]\1 ','')
-    return line
-endfunction
-
-" exproject#open {{{2
-function exproject#open(filename)
-    " if the filename is empty, use default project file
-    let filename = a:filename
-    if filename == ""
-        let filename = g:ex_project_file
-    endif
-
-    " if we open a different project, close the old one first.
-    if filename !=# s:cur_project_file
-        if s:cur_project_file != ""
-            let winnr = bufwinnr(s:cur_project_file)
-            if winnr != -1
-                call ex#window#close(winnr)
-            endif
-        endif
-
-        " reset project filename and title.
-        let s:cur_project_file = a:filename
-    endif
-
-    " open and goto the window
-    call exproject#open_window()
-endfunction
-
-" exproject#open_window {{{2
-
-function! s:init_buffer()
-    " NOTE: this maybe a BUG of Vim.
-    " When I open exproject window and read the file through vimentry scripts,
-    " the events define in exproject/ftdetect/exproject.vim will not execute.
-    " I guess this is because when you are in BufEnter event( the .vimentry
-    " enters ), and open the other buffers, the Vim will not trigger other
-    " buffers' event 
-    " This is why I set the filetype manually here. 
-    set filetype=exproject
-endfunction
-
-function exproject#open_window()
-    let winnr = bufwinnr(s:cur_project_file)
-    if winnr == -1
-        call ex#window#open( 
-                    \ s:cur_project_file, 
-                    \ g:ex_project_winsize,
-                    \ g:ex_project_winpos,
-                    \ 0,
-                    \ 1,
-                    \ function('s:init_buffer')
-                    \ )
-    else
-        exe winnr . 'wincmd w'
-    endif
-endfunction
-
-" exproject#toggle_widnow {{{2
-function exproject#toggle_widnow()
-    let result = exproject#close_window()
-    if result == 0
-        call exproject#open_window()
-    endif
-endfunction
-
-" exproject#close_window {{{2
-function exproject#close_window()
-    if s:cur_project_file != ""
-        let winnr = bufwinnr(s:cur_project_file)
-        if winnr != -1
-            call ex#window#close(winnr)
-            return 1
-        endif
-    endif
-    return 0
-endfunction
-
-" exproject#confirm_select {{{2
-" modifier: '' or 'shift'
-
-function exproject#confirm_select(modifier)
-    " check if the line is valid file line
-    let curline = getline('.') 
-    if match(curline, '\C\[.*\]') == -1
-        call ex#warning('Please select a folder/file')
-        return
-    endif
-
-    let editcmd = 'e'
-    if a:modifier == 'shift'
-        let editcmd = 'bel sp'
-    endif
-
-    " initial variable
-    let cursor_line = line('.')
-    let cursor_col = col('.')
-
-    " if this is a fold, do fold operation or open the path by terminal
-    if foldclosed('.') != -1 || match(curline, '\C\[F\]') != -1
-        if a:modifier == 'shift'
-            " TODO: call ex#terminal ( 'remain', 'nowait', 'cd '. s:exPJ_GetPath(s:exPJ_cursor_line) )
-        else
-            normal! za
-        endif
-        return
-    endif
-
-    let fullpath = exproject#getpath(cursor_line) . exproject#getname(cursor_line)
-
-    silent call cursor(cursor_line,cursor_col)
-
-    " simplify the file name
-    let fullpath = fnamemodify( fullpath, ':p' )
-    let fullpath = escape(fullpath,' ')
-
-    " switch filetype
-    let filetype = fnamemodify( fullpath, ':e' )
-    if filetype == 'err'
-        " TODO:
-        " call ex#hint('load quick fix list: ' . fullpath)
-        " call exUtility#GotoPluginBuffer()
-        " silent exec 'QF '.fullpath
-        " " NOTE: when open error by QF, we don't want to exec exUtility#OperateWindow below ( we want keep stay in the exQF plugin ), so return directly 
-        return 
-    elseif filetype == 'exe'
-        " TODO:
-        " call ex#hint('debug ' . fullpath)
-        " call exUtility#GotoEditBuffer()
-        " call exUtility#Debug( fullpath )
-        return
-    else " default
-        " put the edit file
-        call ex#hint(fnamemodify(fullpath, ':p:.'))
-
-        " goto edit window
-        call ex#window#goto_edit_window()
-
-        " do not open again if the current buffer is the file to be opened
-        if fnamemodify(expand('%'),':p') != fnamemodify(fullpath,':p')
-            silent exec editcmd.' '.fullpath
-        endif
-    endif
-
-    " TODO:
-    " " go back if needed
-    " call exUtility#OperateWindow ( s:exPJ_select_title, g:exPJ_close_when_selected, g:exPJ_backto_editbuf, 0 )
-endfunction
-
-" exproject#search_for_pattern {{{2
-function exproject#search_for_pattern( linenr, pattern )
+" s:search_for_pattern {{{2
+function s:search_for_pattern( linenr, pattern )
     for linenr in range(a:linenr , 1 , -1)
         if match( getline(linenr) , a:pattern ) != -1
             return linenr
@@ -173,8 +21,8 @@ function exproject#search_for_pattern( linenr, pattern )
     return 0
 endfunction
 
-" exproject#getname {{{2
-function exproject#getname( linenr )
+" s:getname {{{2
+function s:getname( linenr )
     let line = getline(a:linenr)
     let line = substitute(line,'.\{-}\[.\{-}\]\(.\{-}\)','\1','')
     let idx_end_1 = stridx(line,' {')
@@ -187,15 +35,15 @@ function exproject#getname( linenr )
     return line
 endfunction
 
-" exproject#getpath {{{2
+" s:getpath {{{2
 " Desc: Get the full path of the line, by YJR
-function exproject#getpath( linenr )
-    let foldlevel = exproject#getfoldlevel(a:linenr)
+function s:getpath( linenr )
+    let foldlevel = s:getfoldlevel(a:linenr)
     let fullpath = ""
 
     " recursively make full path
     if match(getline(a:linenr),'[^^]-\C\[F\]') != -1
-        let fullpath = exproject#getname( a:linenr )
+        let fullpath = s:getname( a:linenr )
     endif
 
     let level_pattern = repeat('.',foldlevel-1)
@@ -204,9 +52,9 @@ function exproject#getpath( linenr )
         let foldlevel -= 1
         let level_pattern = repeat('.',foldlevel*2)
         let fold_pattern = '^'.level_pattern.'-\C\[F\]'
-        let searchpos = exproject#search_for_pattern(searchpos , fold_pattern)
+        let searchpos = s:search_for_pattern(searchpos , fold_pattern)
         if searchpos
-            let fullpath = exproject#getname(searchpos).'/'.fullpath
+            let fullpath = s:getname(searchpos).'/'.fullpath
         else
             call ex#warning('Fold not found')
             break
@@ -216,16 +64,15 @@ function exproject#getpath( linenr )
     return fullpath
 endfunction
 
-" exproject#getfoldlevel {{{2
-function exproject#getfoldlevel(linenr)
+" s:getfoldlevel {{{2
+function s:getfoldlevel(linenr)
     let curline = getline(a:linenr)
     let curline = strpart(curline,0,strridx(curline,'|')+1)
     let str_len = strlen(curline)
     return str_len/2
 endfunction
 
-" exproject#build_tree {{{2
-
+" s:set_level_list {{{2
 function s:set_level_list( linenr )
     " clean the list
     let s:level_list = []
@@ -246,10 +93,12 @@ function s:set_level_list( linenr )
     endwhile
 endfunction
 
+" s:sort_filename {{{2
 function s:sort_filename( i1, i2 )
     return a:i1 ==? a:i2 ? 0 : a:i1 >? a:i2 ? 1 : -1
 endfunction
 
+" s:build_tree {{{2
 function s:build_tree(entry_path, file_filter, folder_filter, filename_list )
     " show progress
     echon 'processing: ' . fnamemodify(a:entry_path, ':p:.') . "\r"
@@ -386,6 +235,163 @@ function s:build_tree(entry_path, file_filter, folder_filter, filename_list )
     return 0
 endfunction
 
+" }}}1
+
+" functions {{{1
+
+" exproject#foldtext {{{2
+" This functions used in ftplugin/exproject.vim for 'setlocal foldtext=' 
+function exproject#foldtext()
+    let line = getline(v:foldstart)
+    let line = substitute(line,'\[F\]\(.\{-}\) {.*','\[+\]\1 ','')
+    return line
+endfunction
+
+" exproject#open {{{2
+function exproject#open(filename)
+    " if the filename is empty, use default project file
+    let filename = a:filename
+    if filename == ""
+        let filename = g:ex_project_file
+    endif
+
+    " if we open a different project, close the old one first.
+    if filename !=# s:cur_project_file
+        if s:cur_project_file != ""
+            let winnr = bufwinnr(s:cur_project_file)
+            if winnr != -1
+                call ex#window#close(winnr)
+            endif
+        endif
+
+        " reset project filename and title.
+        let s:cur_project_file = a:filename
+    endif
+
+    " open and goto the window
+    call exproject#open_window()
+endfunction
+
+" exproject#open_window {{{2
+
+function! s:init_buffer()
+    " NOTE: this maybe a BUG of Vim.
+    " When I open exproject window and read the file through vimentry scripts,
+    " the events define in exproject/ftdetect/exproject.vim will not execute.
+    " I guess this is because when you are in BufEnter event( the .vimentry
+    " enters ), and open the other buffers, the Vim will not trigger other
+    " buffers' event 
+    " This is why I set the filetype manually here. 
+    set filetype=exproject
+endfunction
+
+function exproject#open_window()
+    let winnr = bufwinnr(s:cur_project_file)
+    if winnr == -1
+        call ex#window#open( 
+                    \ s:cur_project_file, 
+                    \ g:ex_project_winsize,
+                    \ g:ex_project_winpos,
+                    \ 0,
+                    \ 1,
+                    \ function('s:init_buffer')
+                    \ )
+    else
+        exe winnr . 'wincmd w'
+    endif
+endfunction
+
+" exproject#toggle_widnow {{{2
+function exproject#toggle_widnow()
+    let result = exproject#close_window()
+    if result == 0
+        call exproject#open_window()
+    endif
+endfunction
+
+" exproject#close_window {{{2
+function exproject#close_window()
+    if s:cur_project_file != ""
+        let winnr = bufwinnr(s:cur_project_file)
+        if winnr != -1
+            call ex#window#close(winnr)
+            return 1
+        endif
+    endif
+    return 0
+endfunction
+
+" exproject#confirm_select {{{2
+" modifier: '' or 'shift'
+function exproject#confirm_select(modifier)
+    " check if the line is valid file line
+    let curline = getline('.') 
+    if match(curline, '\C\[.*\]') == -1
+        call ex#warning('Please select a folder/file')
+        return
+    endif
+
+    let editcmd = 'e'
+    if a:modifier == 'shift'
+        let editcmd = 'bel sp'
+    endif
+
+    " initial variable
+    let cursor_line = line('.')
+    let cursor_col = col('.')
+
+    " if this is a fold, do fold operation or open the path by terminal
+    if foldclosed('.') != -1 || match(curline, '\C\[F\]') != -1
+        if a:modifier == 'shift'
+            " TODO: call ex#terminal ( 'remain', 'nowait', 'cd '. s:exPJ_GetPath(s:exPJ_cursor_line) )
+        else
+            normal! za
+        endif
+        return
+    endif
+
+    let fullpath = s:getpath(cursor_line) . s:getname(cursor_line)
+
+    silent call cursor(cursor_line,cursor_col)
+
+    " simplify the file name
+    let fullpath = fnamemodify( fullpath, ':p' )
+    let fullpath = escape(fullpath,' ')
+
+    " switch filetype
+    let filetype = fnamemodify( fullpath, ':e' )
+    if filetype == 'err'
+        " TODO:
+        " call ex#hint('load quick fix list: ' . fullpath)
+        " call exUtility#GotoPluginBuffer()
+        " silent exec 'QF '.fullpath
+        " " NOTE: when open error by QF, we don't want to exec exUtility#OperateWindow below ( we want keep stay in the exQF plugin ), so return directly 
+        return 
+    elseif filetype == 'exe'
+        " TODO:
+        " call ex#hint('debug ' . fullpath)
+        " call exUtility#GotoEditBuffer()
+        " call exUtility#Debug( fullpath )
+        return
+    else " default
+        " put the edit file
+        call ex#hint(fnamemodify(fullpath, ':p:.'))
+
+        " goto edit window
+        call ex#window#goto_edit_window()
+
+        " do not open again if the current buffer is the file to be opened
+        if fnamemodify(expand('%'),':p') != fnamemodify(fullpath,':p')
+            silent exec editcmd.' '.fullpath
+        endif
+    endif
+
+    " TODO:
+    " " go back if needed
+    " call exUtility#OperateWindow ( s:exPJ_select_title, g:exPJ_close_when_selected, g:exPJ_backto_editbuf, 0 )
+endfunction
+
+" exproject#build_tree {{{2
 function exproject#build_tree()
     let s:level_list = [] " init level list
 
@@ -446,7 +452,7 @@ function exproject#find_current_edit( focus )
     while !found
         if search( cur_filename, 'W' ) > 0
             let linenr = line ('.')
-            let searchfilename = exproject#getpath(linenr) . exproject#getname(linenr)
+            let searchfilename = s:getpath(linenr) . s:getname(linenr)
             if fnamemodify(searchfilename , ':p') == cur_filepath
                 silent call cursor(linenr, 0)
 
@@ -492,6 +498,118 @@ function exproject#toggle_zoom()
         endif
     endif
 
+endfunction
+
+" exproject#refresh_current_folder {{{2
+function exproject#refresh_current_folder()
+    " check if the line is valid file line
+    let file_line = getline('.') 
+    if match(file_line, '.*|.*') == -1
+        call ex#warning( "Please select a file/folder for refresh" )
+        return
+    endif
+
+    " if fold, open it else if not a file return
+    if foldclosed('.') != -1
+        normal! zr
+    endif
+
+    " initial variable
+    let fold_level = s:getfoldlevel(line('.'))
+    let fold_level -= 1
+    let level_pattern = repeat('.',fold_level*2)
+    let full_path_name = ''
+    let fold_pattern = '^'.level_pattern.'-\C\[F\]'
+
+    " get first fold name
+    if match(file_line, '\C\[F\]') == -1
+        if search(fold_pattern,'b')
+            let full_path_name = s:getname(line('.'))
+        else
+            call ex#warning('The project may broke, fold pattern not found: ' . fold_pattern)
+            return
+        endif
+    else
+        let full_path_name = s:getname(line('.'))
+        let fold_level += 1
+    endif
+    let short_dir = full_path_name
+
+    " fold_level 0 will not set path name
+    if fold_level == 0
+        let full_path_name = ''
+    endif
+
+    " save the position
+    let cursor_line = line('.')
+    let cursor_col = col('.')
+
+    " recursively make full path
+    let is_root_dir = 0
+    if fold_level == 0
+        let is_root_dir = 1
+    else
+        while fold_level > 1
+            let fold_level -= 1
+            let level_pattern = repeat('.',fold_level*2)
+            let fold_pattern = '^'.level_pattern.'-\C\[F\]'
+            if search(fold_pattern,'b')
+                let full_path_name = s:getname(line('.')).'/'.full_path_name
+            else
+                call ex#warning('The project may broke, fold pattern not found: ' . fold_pattern)
+                break
+            endif
+        endwhile
+    endif
+    silent call cursor(cursor_line,cursor_col)
+
+    " simplify the file name
+    let full_path_name = fnamemodify( full_path_name, ':p' )
+    " do not escape, or the directory with white-space can't be found
+    "let full_path_name = escape(simplify(full_path_name),' ')
+    let full_path_name = strpart( full_path_name, 0, strlen(full_path_name)-1 )
+    echon "Update directory: " . full_path_name . "\r"
+
+    " set level list if not the root dir
+    if is_root_dir == 0
+        call s:set_level_list(line('.'))
+    endif
+    " delete the whole fold
+    silent exec "normal! zc"
+    silent exec 'normal! "_2dd'
+
+    " start broswing
+    let filename_list = []
+    let file_filter_pattern = '' " TODO: initialize through s:file_filter 
+    let foder_filter_patern = is_root_dir ? '' : '' " TODO: initialize through s:folder_filter 
+    call s:build_tree( 
+                \ full_path_name, 
+                \ file_filter_pattern, 
+                \ foder_filter_patern,
+                \ filename_list 
+                \ ) 
+
+    echon "Update directory: " . full_path_name . " done!\r"
+
+    " at the end, we need to rename the folder as simple one rename the folder
+    let cur_line = getline('.')
+
+    " if this is a empty directory, return
+    let pattern = '\C\[F\].*\<' . short_dir . '\> {'
+    if match(cur_line, pattern) == -1
+        call ex#warning ('The directory is empty')
+        return
+    endif
+
+    let idx_start = stridx(cur_line, ']')
+    let start_part = strpart(cur_line,0,idx_start+1)
+
+    let idx_end = stridx(cur_line, ' {')
+    let end_part = strpart(cur_line,idx_end)
+
+    silent call setline('.', start_part . short_dir . end_part)
+
+    " TODO: save the file
 endfunction
 
 " }}}1
