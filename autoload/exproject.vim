@@ -380,6 +380,8 @@ function exproject#confirm_select(modifier)
         " goto edit window
         call ex#window#goto_edit_window()
 
+        " TODO: we need to findfile, finddir, if both not exists, warning user.
+
         " do not open again if the current buffer is the file to be opened
         if fnamemodify(expand('%'),':p') != fnamemodify(fullpath,':p')
             silent exec editcmd.' '.fullpath
