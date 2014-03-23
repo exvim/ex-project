@@ -212,6 +212,7 @@ function s:build_tree(entry_path, file_filter, folder_filter, filename_list )
         " add file with full path as tag contents
         let filename_path = ex#path#translate(fnamemodify(a:entry_path,':.'),'unix')
         silent call add ( a:filename_list, short_dir."\t".'../'.filename_path."\t1" )
+        return 0
     else
 
         "silent put = strpart(space, 0, strridx(space,'\|-')+1)
@@ -504,6 +505,8 @@ endfunction
 
 " exproject#refresh_current_folder {{{2
 function exproject#refresh_current_folder()
+    let s:level_list = [] " init level list
+
     " check if the line is valid file line
     let file_line = getline('.') 
     if match(file_line, '.*|.*') == -1
@@ -547,9 +550,9 @@ function exproject#refresh_current_folder()
     let cursor_col = col('.')
 
     " recursively make full path
-    let is_root_dir = 0
+    let is_root = 0
     if fold_level == 0
-        let is_root_dir = 1
+        let is_root = 1
     else
         while fold_level > 1
             let fold_level -= 1
@@ -570,10 +573,10 @@ function exproject#refresh_current_folder()
     " do not escape, or the directory with white-space can't be found
     "let full_path_name = escape(simplify(full_path_name),' ')
     let full_path_name = strpart( full_path_name, 0, strlen(full_path_name)-1 )
-    echon "Update directory: " . full_path_name . "\r"
+    echon "ex-project: Refresh folder: " . full_path_name . "\r"
 
     " set level list if not the root dir
-    if is_root_dir == 0
+    if is_root == 0
         call s:set_level_list(line('.'))
     endif
     " delete the whole fold
@@ -583,7 +586,7 @@ function exproject#refresh_current_folder()
     " start broswing
     let filename_list = []
     let file_filter_pattern = '' " TODO: initialize through s:file_filter 
-    let foder_filter_patern = is_root_dir ? '' : '' " TODO: initialize through s:folder_filter 
+    let foder_filter_patern = is_root ? '' : '' " TODO: initialize through s:folder_filter 
     call s:build_tree( 
                 \ full_path_name, 
                 \ file_filter_pattern, 
@@ -591,15 +594,13 @@ function exproject#refresh_current_folder()
                 \ filename_list 
                 \ ) 
 
-    echon "Update directory: " . full_path_name . " done!\r"
-
     " at the end, we need to rename the folder as simple one rename the folder
     let cur_line = getline('.')
 
     " if this is a empty directory, return
     let pattern = '\C\[F\].*\<' . short_dir . '\> {'
     if match(cur_line, pattern) == -1
-        call ex#warning ('The directory is empty')
+        call ex#warning ('The folder is empty')
         return
     endif
 
@@ -611,7 +612,9 @@ function exproject#refresh_current_folder()
 
     silent call setline('.', start_part . short_dir . end_part)
 
-    " TODO: save the file
+    " save the changes
+    silent exec 'w!'
+    echon "ex-project: Refresh folder: " . full_path_name . " done!\r"
 endfunction
 
 " }}}1
