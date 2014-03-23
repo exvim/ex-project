@@ -302,8 +302,8 @@ function exproject#open_window()
     endif
 endfunction
 
-" exproject#toggle_widnow {{{2
-function exproject#toggle_widnow()
+" exproject#toggle_window {{{2
+function exproject#toggle_window()
     let result = exproject#close_window()
     if result == 0
         call exproject#open_window()
@@ -320,6 +320,23 @@ function exproject#close_window()
         endif
     endif
     return 0
+endfunction
+
+" exproject#toggle_zoom {{{2
+function exproject#toggle_zoom()
+    if s:cur_project_file != ""
+        let winnr = bufwinnr(s:cur_project_file)
+        if winnr != -1
+            if s:zoom_in == 0
+                let s:zoom_in = 1
+                call ex#window#resize( winnr, g:ex_project_winpos, g:ex_project_winsize_zoom )
+            else
+                let s:zoom_in = 0
+                call ex#window#resize( winnr, g:ex_project_winpos, g:ex_project_winsize )
+            endif
+        endif
+    endif
+
 endfunction
 
 " exproject#confirm_select {{{2
@@ -484,23 +501,6 @@ function exproject#find_current_edit( focus )
     if !a:focus
         call ex#window#goto_edit_window()
     endif
-endfunction
-
-" exproject#toggle_zoom {{{2
-function exproject#toggle_zoom()
-    if s:cur_project_file != ""
-        let winnr = bufwinnr(s:cur_project_file)
-        if winnr != -1
-            if s:zoom_in == 0
-                let s:zoom_in = 1
-                call ex#window#resize( winnr, g:ex_project_winpos, g:ex_project_winsize_zoom )
-            else
-                let s:zoom_in = 0
-                call ex#window#resize( winnr, g:ex_project_winpos, g:ex_project_winsize )
-            endif
-        endif
-    endif
-
 endfunction
 
 " exproject#refresh_current_folder {{{2

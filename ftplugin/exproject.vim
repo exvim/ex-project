@@ -5,24 +5,24 @@ silent! setlocal nobuflisted
 silent! setlocal cursorline
 silent! setlocal nonumber
 silent! setlocal nowrap
+silent! setlocal statusline=
 
 silent! setlocal foldenable
 silent! setlocal foldmethod=marker foldmarker={,} foldlevel=1
 silent! setlocal foldtext=exproject#foldtext()
 silent! setlocal foldminlines=0
 silent! setlocal foldlevel=9999
-silent! setlocal statusline=
 " }}}1
 
 " Key Mappings {{{1
 " nnoremap <silent> <buffer> <ESC> :EXProjectClose<CR>
 nnoremap <silent> <buffer> <Space> :call exproject#toggle_zoom()<CR>
 
-nmap <buffer> <CR> <Plug>ConfirmSelect
-nmap <buffer> <2-LeftMouse> <Plug>ConfirmSelect
+nmap <buffer> <CR> <Plug>EXPJConfirmSelect
+nmap <buffer> <2-LeftMouse> <Plug>EXPJConfirmSelect
 
-nmap <buffer> <S-Return> <Plug>ShiftConfirmSelect
-nmap <buffer> <S-2-LeftMouse> <Plug>ShiftConfirmSelect
+nmap <buffer> <S-Return> <Plug>EXPJShiftConfirmSelect
+nmap <buffer> <S-2-LeftMouse> <Plug>EXPJShiftConfirmSelect
 
 nnoremap <silent> <buffer> <leader>R    :EXProjectBuild<CR>
 nnoremap <silent> <buffer> <leader>r    :EXProjectRefresh<CR>
