@@ -28,8 +28,8 @@ command! EXProjectRefresh call exproject#refresh_current_folder()
 "}}}
 
 " mappings {{{1
-nnoremap <silent> <Plug>ConfirmSelect :call exproject#confirm_select('')<CR>
-nnoremap <silent> <Plug>ShiftConfirmSelect :call exproject#confirm_select('shift')<CR>
+nnoremap <silent> <Plug>EXPJConfirmSelect :call exproject#confirm_select('')<CR>
+nnoremap <silent> <Plug>EXPJShiftConfirmSelect :call exproject#confirm_select('shift')<CR>
 "}}}
 
 " vim:ts=4:sw=4:sts=4 et fdm=marker:
