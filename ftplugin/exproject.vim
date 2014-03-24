@@ -2,6 +2,7 @@
 silent! setlocal buftype=
 silent! setlocal bufhidden=hide
 silent! setlocal nobuflisted
+
 silent! setlocal cursorline
 silent! setlocal nonumber
 silent! setlocal nowrap
