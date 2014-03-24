@@ -1,15 +1,27 @@
 " variables {{{1
 let s:cur_project_file = "" 
 
-let s:file_filter = []
-let s:file_ignore_pattern = []
-let s:folder_filter = []
-let s:folder_filter_mode = "include" 
+let s:file_filters = []
+let s:file_ignore_patterns = []
+let s:folder_filters = []
+let s:folder_filter_include = 1
 
 let s:zoom_in = 0
 " }}}
 
 " internal functions {{{1
+
+" s:get_filter_pattern {{{2
+function s:get_filter_pattern(filters)
+    let pattern = '\m'
+    for filter in a:filters
+        if filter == ''
+            continue
+        endif
+        let pattern = pattern . '\<' . filter . '\>$\|'
+    endfor
+    return strpart(pattern, 0, strlen(pattern)-2)
+endfunction
 
 " s:search_for_pattern {{{2
 function s:search_for_pattern( linenr, pattern )
@@ -99,7 +111,7 @@ function s:sort_filename( i1, i2 )
 endfunction
 
 " s:build_tree {{{2
-function s:build_tree(entry_path, file_filter, folder_filter, filename_list )
+function s:build_tree( entry_path, file_pattern, folder_pattern, folder_include, filename_list )
     " show progress
     echon 'processing: ' . fnamemodify(a:entry_path, ':p:.') . "\r"
 
@@ -118,22 +130,36 @@ function s:build_tree(entry_path, file_filter, folder_filter, filename_list )
         let list_last = len(file_list)-1
         let list_count = 0
         while list_count <= list_last
-            if isdirectory(file_list[list_idx]) == 0 " remove not fit file types
+            " remove not fit file types
+            if isdirectory(file_list[list_idx]) == 0
                 let suffix = fnamemodify ( file_list[list_idx], ':e' ) 
+                if suffix == ''
+                    let suffix = '__EMPTY__'
+                endif
                 " move the file to the end of the list
-                if ( match ( suffix, a:file_filter ) != -1 ) ||
-                 \ ( suffix == '' && match ( 'NULL', a:file_filter ) != -1 ) 
+                if match ( suffix, a:file_pattern ) != -1 
                     let file = remove(file_list,list_idx)
                     silent call add(file_list, file)
                 else " if not found file type in file filter
                     silent call remove(file_list,list_idx)
                 endif
                 let list_idx -= 1
-            elseif a:folder_filter != '' " remove not fit dirs
-                if match( file_list[list_idx], a:folder_filter ) == -1 " if not found dir name in dir filter
-                    silent call remove(file_list,list_idx)
-                    let list_idx -= 1
+
+            elseif a:folder_pattern != '' " remove not fit dirs
+                " if include && not found in pattner 
+                if a:folder_include 
+                    if match( file_list[list_idx], a:folder_pattern ) == -1
+                        silent call remove(file_list,list_idx)
+                        let list_idx -= 1
+                    endif
+                " if exclude && found in pattner 
+                else
+                    if match( file_list[list_idx], a:folder_pattern ) != -1
+                        silent call remove(file_list,list_idx)
+                        let list_idx -= 1
+                    endif
                 endif
+
             " DISABLE: in our case, globpath never search hidden folder. { 
             " elseif len (s:level_list) == 0 " in first level directory, if we .vimfiles* folders, remove them
             "     if match( file_list[list_idx], '\<.vimfiles.*' ) != -1
@@ -157,7 +183,14 @@ function s:build_tree(entry_path, file_filter, folder_filter, filename_list )
             if list_idx != list_last
                 let s:level_list[len(s:level_list)-1].is_last = 0
             endif
-            if s:build_tree(file_list[list_idx],a:file_filter,'',a:filename_list) == 1 " if it is empty
+            " if it is empty
+            if s:build_tree(
+                        \ file_list[list_idx],
+                        \ a:file_pattern,
+                        \ '',
+                        \ a:folder_include,
+                        \ a:filename_list
+                        \ ) == 1
                 silent call remove(file_list,list_idx)
                 let list_last = len(file_list)-1
             endif
@@ -426,12 +459,13 @@ function exproject#build_tree()
 
     " start tree building
     let filename_list = []
-    let file_filter_pattern = '' " TODO: initialize through s:file_filter 
-    let foder_filter_patern = '' " TODO: initialize through s:folder_filter 
+    let file_filter_pattern = s:get_filter_pattern(s:file_filters)
+    let foder_filter_patern = s:get_filter_pattern(s:folder_filters)
     call s:build_tree( 
                 \ entry_dir, 
                 \ file_filter_pattern, 
                 \ foder_filter_patern, 
+                \ s:folder_filter_include,
                 \ filename_list )
 
     silent keepjumps normal! gg
@@ -585,12 +619,13 @@ function exproject#refresh_current_folder()
 
     " start broswing
     let filename_list = []
-    let file_filter_pattern = '' " TODO: initialize through s:file_filter 
-    let foder_filter_patern = is_root ? '' : '' " TODO: initialize through s:folder_filter 
+    let file_filter_pattern = s:get_filter_pattern(s:file_filters)
+    let foder_filter_patern = is_root ? s:get_filter_pattern(s:folder_filters) : ''
     call s:build_tree( 
                 \ full_path_name, 
                 \ file_filter_pattern, 
                 \ foder_filter_patern,
+                \ s:folder_filter_include,
                 \ filename_list 
                 \ ) 
 
@@ -615,6 +650,26 @@ function exproject#refresh_current_folder()
     " save the changes
     silent exec 'w!'
     echon "ex-project: Refresh folder: " . full_path_name . " done!\r"
+endfunction
+
+" exproject#set_file_filters {{{2
+function exproject#set_file_filters( filters )
+    let s:file_filters = a:filters
+endfunction
+
+" exproject#set_file_ignore_patterns {{{2
+function exproject#set_file_ignore_patterns( patterns )
+    let s:file_ignore_patterns = a:patterns
+endfunction
+
+" exproject#set_folder_filters {{{2
+function exproject#set_folder_filters( filters )
+    let s:folder_filters = a:filters
+endfunction
+
+" exproject#set_folder_filter_mode {{{2
+function exproject#set_folder_filter_mode( mode )
+    let s:folder_filter_include = (a:mode == 'include')
 endfunction
 
 " }}}1
