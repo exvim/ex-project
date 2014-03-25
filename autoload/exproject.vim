@@ -36,7 +36,8 @@ endfunction
 " s:getname {{{2
 function s:getname( linenr )
     let line = getline(a:linenr)
-    let line = substitute(line,'.\{-}\[.\{-}\]\(.\{-}\)','\1','')
+    " let line = substitute(line,'.\{-}\[.\{-}\]\(.\{-}\)','\1','')
+    let line = substitute(line,'.\{-}-\(\[F\]\)\{0,1}\(.\{-}\)','\2','')
     let idx_end_1 = stridx(line,' {')
     let idx_end_2 = stridx(line,' }')
     if idx_end_1 != -1
@@ -237,10 +238,12 @@ function s:build_tree( entry_path, file_pattern, folder_pattern, folder_include,
             let end_space = strpart(end_space,0,strridx(end_space,'|')+1)
             silent put! = end_space " . end_fold
         endif
+
         " put it
         " let file_type = strpart( short_dir, strridx(short_dir,'.')+1, 1 )
         let file_type = strpart( fnamemodify( short_dir, ":e" ), 0, 1 )
-        silent put! = space.'['.file_type.']'.short_dir . end_fold
+        " silent put! = space.'['.file_type.']'.short_dir . end_fold
+        silent put! = space.short_dir . end_fold
 
         " add file with full path as tag contents
         let filename_path = ex#path#translate(fnamemodify(a:entry_path,':.'),'unix')
@@ -377,7 +380,7 @@ endfunction
 function exproject#confirm_select(modifier)
     " check if the line is valid file line
     let curline = getline('.') 
-    if match(curline, '\C\[.*\]') == -1
+    if match(curline, '-\(\C\[.*\]\)\{0,1}') == -1
         call ex#warning('Please select a folder/file')
         return
     endif
