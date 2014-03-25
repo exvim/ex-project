@@ -9,22 +9,25 @@ endif
 syntax match ex_pj_help #^".*#
 syntax match ex_pj_fold_start '{'
 syntax match ex_pj_fold_end '}'
-syntax match ex_pj_tree_line '\( |\)\+-\{0,1}'
+syntax match ex_pj_tree_line '\( |\)\+-\{0,1}.*' contains=ex_pj_folder_name,ex_pj_file_name
 " syntax match ex_pj_filter '^.* filter = .*$'
 
 syntax match ex_pj_folder_label '\C\[F\]'
-syntax match ex_pj_folder_name '\(\C\[F\]\)\@<=\S.*' contains=ex_pj_fold_start,ex_pj_fold_end
+syntax match ex_pj_folder_name '\C\[F\]\S.*'hs=s+3 contains=ex_pj_folder_label,ex_pj_fold_start,ex_pj_fold_end
 
-syntax match ex_pj_file_name '|-\zs[^\(\C\[F\]\)]\S.*' contains=ex_pj_fold_start,ex_pj_fold_end
+syntax match ex_pj_file_name '|-[^\[]\S.*'ms=s+2 contains=@ex_pj_special_files,ex_pj_fold_start,ex_pj_fold_end
 
-" syntax match ex_pj_clang_src_label '\C\[c\]'
-" syntax match ex_pj_clang_src_name '\(\[c\]\)\@<=\S.*' contains=ex_pj_fold_start,ex_pj_fold_end
+syntax match ex_pj_ft_exvim '.*\.\(exvim\|vimentry\|vimproject\)$' contained
+syntax match ex_pj_ft_clang_src '.*\.\(c\|cpp\|cxx\)$' contained
+syntax match ex_pj_ft_clang_header '.*\.h$' contained
+syntax match ex_pj_ft_error '.*\.err$' contained
 
-" syntax match ex_pj_clang_header_label '\[\(h\|i\)\]'
-" syntax match ex_pj_clang_header_name '\(\[h\|i\]\)\@<=\S.*' contains=ex_pj_fold_start,ex_pj_fold_end
+syntax cluster ex_pj_special_files contains=
+            \ex_pj_ft_exvim
+            \,ex_pj_ft_clang_src
+            \,ex_pj_ft_clang_header
+            \,ex_pj_ft_error
 
-" syntax match ex_pj_error_file_label '\[e\]'
-" syntax match ex_pj_error_file_name '\(\[e\]\)\@<=\S.*' contains=ex_pj_fold_start,ex_pj_fold_end
 
 hi link ex_pj_fold_start exTransparent
 hi link ex_pj_fold_end exTransparent
@@ -37,16 +40,12 @@ hi link ex_pj_folder_label Title
 hi link ex_pj_folder_name Directory
 
 " hi link ex_pj_file_label Question
-hi link ex_pj_file_name Question
+hi link ex_pj_file_name Normal
 
-" hi link ex_pj_clang_src_label DiffChange
-" hi link ex_pj_clang_src_name Normal
-
-" hi link ex_pj_clang_header_label DiffAdd
-" hi link ex_pj_clang_header_name Normal
-
-" hi link ex_pj_error_file_label Error
-" hi link ex_pj_error_file_name Normal
+hi link ex_pj_ft_exvim DiffAdd
+hi link ex_pj_ft_clang_src String
+hi link ex_pj_ft_clang_header Label
+hi link ex_pj_ft_error Error
 
 let b:current_syntax = "exproject"
 
