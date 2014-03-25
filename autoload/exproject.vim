@@ -114,7 +114,7 @@ endfunction
 " s:build_tree {{{2
 function s:build_tree( entry_path, file_pattern, folder_pattern, folder_include, filename_list )
     " show progress
-    echon 'processing: ' . fnamemodify(a:entry_path, ':p:.') . "\r"
+    echon ex#short_message( 'processing: ' . fnamemodify(a:entry_path, ':p:.') ) . "\r"
 
     " get short_dir
     " let short_dir = strpart( a:entry_path, strridx(a:entry_path,'\')+1 )
