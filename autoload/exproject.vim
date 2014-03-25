@@ -394,11 +394,7 @@ function exproject#confirm_select(modifier)
     " if this is a fold, do fold operation or open the path by terminal
     if foldclosed('.') != -1 || match(curline, '\C\[F\]') != -1
         if a:modifier == 'shift'
-            if ex#is_windows()
-                silent exec '!explore ' . s:getpath(cursor_line)
-            elseif ex#is_osx()
-                silent exec '!open ' . s:getpath(cursor_line)
-            endif
+            call ex#os#open(s:getpath(cursor_line))
         else
             normal! za
         endif
