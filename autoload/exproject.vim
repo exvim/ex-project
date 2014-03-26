@@ -11,18 +11,6 @@ let s:zoom_in = 0
 
 " internal functions {{{1
 
-" s:get_filter_pattern {{{2
-function s:get_filter_pattern(filters)
-    let pattern = '\m'
-    for filter in a:filters
-        if filter == ''
-            continue
-        endif
-        let pattern = pattern . '\<' . filter . '\>$\|'
-    endfor
-    return strpart(pattern, 0, strlen(pattern)-2)
-endfunction
-
 " s:search_for_pattern {{{2
 function s:search_for_pattern( linenr, pattern )
     for linenr in range(a:linenr , 1 , -1)
@@ -462,8 +450,8 @@ function exproject#build_tree()
 
     " start tree building
     let filename_list = []
-    let file_filter_pattern = s:get_filter_pattern(s:file_filters)
-    let foder_filter_patern = s:get_filter_pattern(s:folder_filters)
+    let file_filter_pattern = ex#pattern#last_words(s:file_filters)
+    let foder_filter_patern = ex#pattern#last_words(s:folder_filters)
     call s:build_tree( 
                 \ entry_dir, 
                 \ file_filter_pattern, 
@@ -622,8 +610,8 @@ function exproject#refresh_current_folder()
 
     " start broswing
     let filename_list = []
-    let file_filter_pattern = s:get_filter_pattern(s:file_filters)
-    let foder_filter_patern = is_root ? s:get_filter_pattern(s:folder_filters) : ''
+    let file_filter_pattern = ex#pattern#last_words(s:file_filters)
+    let foder_filter_patern = is_root ? ex#pattern#last_words(s:folder_filters) : ''
     call s:build_tree( 
                 \ full_path_name, 
                 \ file_filter_pattern, 
