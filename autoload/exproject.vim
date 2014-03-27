@@ -7,6 +7,7 @@ let s:folder_filters = []
 let s:folder_filter_include = 1
 
 let s:zoom_in = 0
+let s:keymap = {}
 " }}}
 
 " internal functions {{{1
@@ -263,6 +264,16 @@ endfunction
 " }}}1
 
 " functions {{{1
+
+" exproject#bind_mappings {{{2
+function exproject#bind_mappings()
+    call ex#keymap#bind( s:keymap )
+endfunction
+
+" exproject#register_hotkey {{{2
+function exproject#register_hotkey( priority, key, action, desc )
+    call ex#keymap#register( s:keymap, a:priority, a:key, a:action, a:desc )
+endfunction
 
 " exproject#foldtext {{{2
 " This functions used in ftplugin/exproject.vim for 'setlocal foldtext=' 

@@ -27,4 +27,28 @@ command! EXProjectFind call exproject#find_current_edit(1)
 command! EXProjectRefresh call exproject#refresh_current_folder()
 "}}}
 
+" default key mappings {{{1
+call exproject#register_hotkey( 1 , '<CR>'            , ":call exproject#confirm_select('')<CR>"      , 'File: Open it. Folder: Fold in/out.' )
+call exproject#register_hotkey( 2 , '<2-LeftMouse>'   , ":call exproject#confirm_select('')<CR>"      , 'File: Open it. Folder: Fold in/out.' )
+call exproject#register_hotkey( 3 , '<S-CR>'          , ":call exproject#confirm_select('shift')<CR>" , 'File: Split and open it. Folder: Open the folder in os file browser.' )
+call exproject#register_hotkey( 4 , '<S-2-LeftMouse>' , ":call exproject#confirm_select('shift')<CR>" , 'File: Split and open it. Folder: Open the folder in os file browser.' )
+call exproject#register_hotkey( 5 , '<Space>'         , ":call exproject#toggle_zoom()<CR>"           , 'Zoom in/out project window.' )
+call exproject#register_hotkey( 6 , '<leader>R'       , ":EXProjectBuild<CR>"                         , 'Rebuild project tree.' )
+call exproject#register_hotkey( 7 , '<leader>r'       , ":EXProjectRefresh<CR>"                       , 'Refresh current folder.' )
+
+" TODO:
+" nnoremap <silent> <buffer> <leader>e    :call <SID>exPJ_EchoPath()<CR>
+
+" "
+" nnoremap <silent> <buffer> <c-up> :call exUtility#CursorJump( 'ErrorLog.err', 'up' )<CR>
+" nnoremap <silent> <buffer> <c-down> :call exUtility#CursorJump( 'ErrorLog.err', 'down' )<CR>
+
+" nnoremap <silent> <buffer> <c-k> :call exUtility#CursorJump( '\C\[F\]', 'up' )<CR>
+" nnoremap <silent> <buffer> <c-j> :call exUtility#CursorJump( '\C\[F\]', 'down' )<CR>
+
+" "
+" nnoremap <silent> <buffer> o  :call <SID>exPJ_CreateNewFile()<CR>
+" nnoremap <silent> <buffer> O  :call <SID>exPJ_CreateNewFold()<CR>
+"}}}
+
 " vim:ts=4:sw=4:sts=4 et fdm=marker:
