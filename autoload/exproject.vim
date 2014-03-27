@@ -8,9 +8,24 @@ let s:folder_filter_include = 1
 
 let s:zoom_in = 0
 let s:keymap = {}
+
+let s:help_open = 0
+let s:help_text_short = [
+            \ '" Press <F1> for help',
+            \ '',
+            \ ]
+let s:help_text = s:help_text_short
 " }}}
 
 " internal functions {{{1
+" s:update_help_text {{{2
+function s:update_help_text()
+    if s:help_open
+        let s:help_text = ex#keymap#helptext(s:keymap)
+    else
+        let s:help_text = s:help_text_short
+    endif
+endfunction
 
 " s:search_for_pattern {{{2
 function s:search_for_pattern( linenr, pattern )
@@ -275,12 +290,13 @@ function exproject#register_hotkey( priority, key, action, desc )
     call ex#keymap#register( s:keymap, a:priority, a:key, a:action, a:desc )
 endfunction
 
-" exproject#foldtext {{{2
-" This functions used in ftplugin/exproject.vim for 'setlocal foldtext=' 
-function exproject#foldtext()
-    let line = getline(v:foldstart)
-    let line = substitute(line,'\[F\]\(.\{-}\) {.*','\[+\]\1 ','')
-    return line
+" exproject#toggle_help {{{2
+function exproject#toggle_help()
+    let s:help_open = !s:help_open
+    silent exec '1,' . len(s:help_text) . 'd _'
+    call s:update_help_text()
+    silent call append ( 0, s:help_text )
+    silent keepjumps normal! gg
 endfunction
 
 " exproject#open {{{2
@@ -371,7 +387,28 @@ function exproject#toggle_zoom()
             endif
         endif
     endif
+endfunction
 
+" exproject#on_save {{{2
+function exproject#on_save()
+    let cursor_line = line('.')
+    let cursor_col = col('.')
+
+    if s:help_open 
+        let cursor_line = cursor_line - (len(s:help_text) - len(s:help_text_short)) 
+        call exproject#toggle_help()
+    endif
+
+    silent call cursor(cursor_line,cursor_col)
+    silent normal! zz
+endfunction
+
+" exproject#foldtext {{{2
+" This functions used in ftplugin/exproject.vim for 'setlocal foldtext=' 
+function exproject#foldtext()
+    let line = getline(v:foldstart)
+    let line = substitute(line,'\[F\]\(.\{-}\) {.*','\[+\]\1 ','')
+    return line
 endfunction
 
 " exproject#confirm_select {{{2
@@ -472,11 +509,8 @@ function exproject#build_tree()
 
     silent keepjumps normal! gg
 
-    " TODO: add online help 
-    silent call append ( 0, [
-                \ '" Press ? for help',
-                \ '',
-                \ ] )
+    " add online help 
+    silent call append ( 0, s:help_text )
 
     " save the build
     silent exec 'w!'

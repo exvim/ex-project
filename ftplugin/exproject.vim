@@ -20,7 +20,11 @@ call exproject#bind_mappings()
 " }}}1
 
 " auto command {{{1
-" au CursorHold <buffer> :call s:exPJ_EchoPath()
+augroup ex_project
+    au!
+    au BufWritePre <buffer> call exproject#on_save()
+    " au CursorHold <buffer> :call s:exPJ_EchoPath()
+augroup END
 " }}}1
 
 " vim:ts=4:sw=4:sts=4 et fdm=marker:
