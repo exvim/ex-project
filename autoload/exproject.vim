@@ -467,6 +467,11 @@ function exproject#confirm_select(modifier)
         " put the edit file
         call ex#hint(fnamemodify(fullpath, ':p:.'))
 
+        " zoom out project before we goto edit window
+        if s:zoom_in == 1
+            call exproject#toggle_zoom()
+        endif
+
         " goto edit window
         call ex#window#goto_edit_window()
 
