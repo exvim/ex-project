@@ -19,14 +19,16 @@ silent! setlocal foldlevel=9999
 " nnoremap <silent> <buffer> <ESC> :EXProjectClose<CR>
 nnoremap <silent> <buffer> <Space> :call exproject#toggle_zoom()<CR>
 
-nmap <buffer> <CR> <Plug>EXPJConfirmSelect
-nmap <buffer> <2-LeftMouse> <Plug>EXPJConfirmSelect
+nnoremap <silent> <buffer> <Plug>ConfirmSelect :call exproject#confirm_select('')<CR>
+nmap <silent> <buffer> <CR> <Plug>ConfirmSelect
+nmap <silent> <buffer> <2-LeftMouse> <Plug>ConfirmSelect
 
-nmap <buffer> <S-Return> <Plug>EXPJShiftConfirmSelect
-nmap <buffer> <S-2-LeftMouse> <Plug>EXPJShiftConfirmSelect
+nnoremap <silent> <buffer> <Plug>ShiftConfirmSelect :call exproject#confirm_select('shift')<CR>
+nmap <silent> <buffer> <S-Return> <Plug>ShiftConfirmSelect
+nmap <silent> <buffer> <S-2-LeftMouse> <Plug>ShiftConfirmSelect
 
-nnoremap <silent> <buffer> <leader>R    :EXProjectBuild<CR>
-nnoremap <silent> <buffer> <leader>r    :EXProjectRefresh<CR>
+nnoremap <silent> <buffer> <leader>R :EXProjectBuild<CR>
+nnoremap <silent> <buffer> <leader>r :EXProjectRefresh<CR>
 " nnoremap <silent> <buffer> <leader>e    :call <SID>exPJ_EchoPath()<CR>
 
 " "
