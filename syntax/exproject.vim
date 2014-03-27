@@ -5,7 +5,10 @@ elseif exists("b:current_syntax")
 endif
 
 " syntax highlight
-syntax match ex_pj_help #^".*#
+syntax match ex_pj_help #^".*# contains=ex_pj_help_key
+syntax match ex_pj_help_key '^" \S\+:'hs=s+2,he=e-1 contained contains=ex_pj_help_comma
+syntax match ex_pj_help_comma ':' contained
+
 syntax match ex_pj_fold '{\|}'
 syntax match ex_pj_tree_line '\( |\)\+-\{0,1}.*' contains=ex_pj_folder_name,ex_pj_file_name
 
@@ -29,6 +32,9 @@ syntax cluster ex_pj_special_files contains=
 hi link ex_pj_fold exTransparent
 
 hi link ex_pj_help Comment
+hi link ex_pj_help_key Label
+hi link ex_pj_help_comma Special
+
 hi link ex_pj_tree_line Comment
 
 hi link ex_pj_folder_label Title
