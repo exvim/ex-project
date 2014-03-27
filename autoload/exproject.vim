@@ -532,9 +532,9 @@ endfunction
 function exproject#refresh_current_folder()
     let s:level_list = [] " init level list
 
-    " check if the line is valid file line
+    " if the line is neither a file/folder line nor a root folder line, return 
     let file_line = getline('.') 
-    if match(file_line, '.*|.*') == -1
+    if match(file_line, '\( |\)\+-\{0,1}.*') == -1 && match(file_line, '-\C\[F\]') == -1
         call ex#warning( "Please select a file/folder for refresh" )
         return
     endif
@@ -645,17 +645,17 @@ endfunction
 
 " exproject#set_file_filters {{{2
 function exproject#set_file_filters( filters )
-    let s:file_filters = a:filters
+    let s:file_filters = copy(a:filters)
 endfunction
 
 " exproject#set_file_ignore_patterns {{{2
 function exproject#set_file_ignore_patterns( patterns )
-    let s:file_ignore_patterns = a:patterns
+    let s:file_ignore_patterns = copy(a:patterns)
 endfunction
 
 " exproject#set_folder_filters {{{2
 function exproject#set_folder_filters( filters )
-    let s:folder_filters = a:filters
+    let s:folder_filters = copy(a:filters)
 endfunction
 
 " exproject#set_folder_filter_mode {{{2
