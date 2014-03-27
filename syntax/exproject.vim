@@ -29,12 +29,11 @@ syntax cluster ex_pj_special_files contains=
             \,ex_pj_ft_error
 
 
-hi link ex_pj_fold exTransparent
-
 hi link ex_pj_help Comment
 hi link ex_pj_help_key Label
 hi link ex_pj_help_comma Special
 
+hi link ex_pj_fold exTransparent
 hi link ex_pj_tree_line Comment
 
 hi link ex_pj_folder_label Title

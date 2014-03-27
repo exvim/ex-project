@@ -18,14 +18,6 @@ let s:help_text = s:help_text_short
 " }}}
 
 " internal functions {{{1
-" s:update_help_text {{{2
-function s:update_help_text()
-    if s:help_open
-        let s:help_text = ex#keymap#helptext(s:keymap)
-    else
-        let s:help_text = s:help_text_short
-    endif
-endfunction
 
 " s:search_for_pattern {{{2
 function s:search_for_pattern( linenr, pattern )
@@ -291,6 +283,16 @@ function exproject#register_hotkey( priority, key, action, desc )
 endfunction
 
 " exproject#toggle_help {{{2
+
+" s:update_help_text {{{2
+function s:update_help_text()
+    if s:help_open
+        let s:help_text = ex#keymap#helptext(s:keymap)
+    else
+        let s:help_text = s:help_text_short
+    endif
+endfunction
+
 function exproject#toggle_help()
     let s:help_open = !s:help_open
     silent exec '1,' . len(s:help_text) . 'd _'
@@ -326,7 +328,7 @@ endfunction
 
 " exproject#open_window {{{2
 
-function! s:init_buffer()
+function s:init_buffer()
     " NOTE: this maybe a BUG of Vim.
     " When I open exproject window and read the file through vimentry scripts,
     " the events define in exproject/ftdetect/exproject.vim will not execute.
@@ -391,16 +393,16 @@ endfunction
 
 " exproject#on_save {{{2
 function exproject#on_save()
-    let cursor_line = line('.')
-    let cursor_col = col('.')
-
     if s:help_open 
+        let cursor_line = line('.')
+        let cursor_col = col('.')
         let cursor_line = cursor_line - (len(s:help_text) - len(s:help_text_short)) 
-        call exproject#toggle_help()
-    endif
 
-    silent call cursor(cursor_line,cursor_col)
-    silent normal! zz
+        call exproject#toggle_help()
+
+        silent call cursor(cursor_line,cursor_col)
+        silent normal! zz
+    endif
 endfunction
 
 " exproject#foldtext {{{2
