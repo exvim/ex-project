@@ -328,7 +328,7 @@ endfunction
 
 " exproject#open_window {{{2
 
-function s:init_buffer()
+function exproject#init_buffer()
     " NOTE: this maybe a BUG of Vim.
     " When I open exproject window and read the file through vimentry scripts,
     " the events define in exproject/ftdetect/exproject.vim will not execute.
@@ -348,7 +348,7 @@ function exproject#open_window()
                     \ g:ex_project_winpos,
                     \ 0,
                     \ 1,
-                    \ function('s:init_buffer')
+                    \ function('exproject#init_buffer')
                     \ )
     else
         exe winnr . 'wincmd w'
