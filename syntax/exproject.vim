@@ -18,15 +18,15 @@ syntax match ex_pj_folder_name '\C\[F\].*'hs=s+3 contains=ex_pj_folder_label,ex_
 syntax match ex_pj_file_name '|-[^\[]\+'ms=s+2 contains=@ex_pj_special_files,ex_pj_fold
 
 syntax match ex_pj_ft_exvim '.*\.\(exvim\|vimentry\|vimproject\)\>' contained
-syntax match ex_pj_ft_clang_src '.*\.\(c\|cpp\|cxx\)\>' contained
-syntax match ex_pj_ft_clang_header '.*\.h\>' contained
 syntax match ex_pj_ft_error '.*\.err\>' contained
+" syntax match ex_pj_ft_clang_src '.*\.\(c\|cpp\|cxx\)\>' contained
+" syntax match ex_pj_ft_clang_header '.*\.h\>' contained
 
 syntax cluster ex_pj_special_files contains=
             \ex_pj_ft_exvim
-            \,ex_pj_ft_clang_src
-            \,ex_pj_ft_clang_header
             \,ex_pj_ft_error
+            " \,ex_pj_ft_clang_src
+            " \,ex_pj_ft_clang_header
 
 
 hi link ex_pj_help Comment
@@ -41,9 +41,9 @@ hi link ex_pj_folder_name Directory
 
 hi link ex_pj_file_name Normal
 hi link ex_pj_ft_exvim DiffAdd
-hi link ex_pj_ft_clang_src String
-hi link ex_pj_ft_clang_header Label
 hi link ex_pj_ft_error Error
+" hi link ex_pj_ft_clang_src String
+" hi link ex_pj_ft_clang_header Label
 
 let b:current_syntax = "exproject"
 
