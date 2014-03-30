@@ -715,6 +715,114 @@ function exproject#set_folder_filter_mode( mode )
     let s:folder_filter_include = (a:mode == 'include')
 endfunction
 
+" exproject#newfile {{{2
+function exproject#newfile()
+    " check if the line is valid file line
+    let cur_line = getline('.') 
+    if match(cur_line, '\( |\)\+-.*') == -1
+        call ex#warning ("Can't create new file here. Please move your cursor to a file or a folder.")
+        return
+    endif
+
+    let reg_t = @t
+    if foldclosed('.') != -1
+        silent exec 'normal! j"tyy"t2p$a-'
+        return
+    endif
+
+    " if this is directory
+    if match(cur_line, '\C\[F\]') != -1
+        let idx = stridx(cur_line, '}')
+        if idx == -1
+            silent exec 'normal! j"tyy"tP'
+            silent call search('|-', 'c')
+            silent exec 'normal! c$|-'
+            silent exec 'startinsert!'
+        else
+            let surfix = strpart(cur_line,idx-1)
+            silent call setline('.',strpart(cur_line,0,idx-1))
+            let file_line = strpart(cur_line, 0, stridx(cur_line,'-')) . " |-" . surfix
+            put = file_line
+            silent call search(' }', 'c')
+            silent exec 'startinsert'
+        endif
+    " if this is file
+    else
+        let idx = stridx(cur_line, '}')
+        if idx == -1
+            silent exec 'normal! "tyyj"tP'
+            silent call search('|-','c')
+            silent exec 'normal! c$|-'
+            silent exec 'startinsert!'
+        else
+            let surfix = strpart(cur_line,idx-1)
+            silent call setline('.',strpart(cur_line,0,idx-1))
+            let file_line = strpart(cur_line, 0, stridx(cur_line,'-')) . "-" . surfix
+            put = file_line
+            silent call search(' }','c')
+            silent exec 'startinsert'
+        endif
+    endif
+    let @t = reg_t
+endfunction
+
+" exproject#newfolder {{{2
+function exproject#newfolder()
+    " check if the line is valid folder line
+    let cur_line = getline('.') 
+    if match(cur_line, '\C\[F\]') == -1
+        call ex#warning ("Can't create new folder here, Please move your cursor to a parent folder.")
+        return
+    endif
+
+    " let foldername = inputdialog( 'Folder Name: ', '' )
+    silent echohl Question
+    let foldername = input( 'Folder Name: ', '' )
+    silent echohl none 
+
+    if foldername == ''
+        call ex#warning ("Can't create empty folder.")
+        return
+    else
+        let path = s:getpath(line('.'))
+        if finddir( foldername, path ) != '' 
+            call ex#warning (" The folder " . foldername . " already exists!" )
+            return
+        endif
+
+        if path == ''
+            let path = '.'
+        endif
+        call mkdir( path . '/' . foldername )
+        call ex#hint ( " created!" )
+    endif
+
+    let reg_t = @t
+    if foldclosed('.') != -1
+        silent exec 'normal! j"tyy"t2p$a-[F]' . foldername . ' { }'
+        return
+    endif
+
+    let idx = stridx(cur_line, '}')
+    if idx == -1
+        let file_line = cur_line
+        put = file_line
+        silent call search('-\[F\]','c')
+        silent exec 'normal! c$ |-[F]' . foldername . ' { }'
+    else
+        let surfix = strpart(cur_line,idx-1)
+        silent call setline('.',strpart(cur_line,0,idx-1))
+        let file_line = strpart(cur_line, 0, stridx(cur_line,'-')) 
+                    \ . ' |-[F]' 
+                    \ . foldername 
+                    \ . ' { }' 
+                    \ . surfix
+        put = file_line
+    endif
+
+    let @t = reg_t
+endfunction
+
 " }}}1
 
 " vim:ts=4:sw=4:sts=4 et fdm=marker:
