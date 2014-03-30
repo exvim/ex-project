@@ -337,6 +337,11 @@ function exproject#init_buffer()
     " buffers' event 
     " This is why I set the filetype manually here. 
     set filetype=exproject
+
+    if ( line('$') <= 1 )
+        silent call append ( 0, s:help_text )
+        silent exec '$d'
+    endif
 endfunction
 
 function exproject#open_window()
