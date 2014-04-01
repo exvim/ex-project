@@ -345,6 +345,8 @@ function exproject#init_buffer()
 endfunction
 
 function exproject#open_window()
+    call ex#window#goto_edit_window()
+
     let winnr = bufwinnr(s:cur_project_file)
     if winnr == -1
         call ex#window#open( 
