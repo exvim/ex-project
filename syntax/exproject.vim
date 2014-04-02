@@ -29,21 +29,21 @@ syntax cluster ex_pj_special_files contains=
             " \,ex_pj_ft_clang_header
 
 
-hi link ex_pj_help Comment
-hi link ex_pj_help_key Label
-hi link ex_pj_help_comma Special
+hi default link ex_pj_help Comment
+hi default link ex_pj_help_key Label
+hi default link ex_pj_help_comma Special
 
-hi link ex_pj_fold exTransparent
-hi link ex_pj_tree_line Comment
+hi default link ex_pj_fold exTransparent
+hi default link ex_pj_tree_line Comment
 
-hi link ex_pj_folder_label Title
-hi link ex_pj_folder_name Directory
+hi default link ex_pj_folder_label Title
+hi default link ex_pj_folder_name Directory
 
-hi link ex_pj_file_name Normal
-hi link ex_pj_ft_exvim DiffAdd
-hi link ex_pj_ft_error Error
-" hi link ex_pj_ft_clang_src String
-" hi link ex_pj_ft_clang_header Label
+hi default link ex_pj_file_name Normal
+hi default link ex_pj_ft_exvim DiffAdd
+hi default link ex_pj_ft_error Error
+" hi default link ex_pj_ft_clang_src String
+" hi default link ex_pj_ft_clang_header Label
 
 let b:current_syntax = "exproject"
 
