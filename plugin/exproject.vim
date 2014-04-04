@@ -22,6 +22,7 @@ endif
 command! -n=1 -complete=file EXProject call exproject#open('<args>')
 command! EXProjectOpen call exproject#open_window()
 command! EXProjectClose call exproject#close_window()
+command! EXProjectToggle call exproject#toggle_window()
 command! EXProjectBuild call exproject#build_tree()
 command! EXProjectFind call exproject#find_current_edit(1)
 command! EXProjectRefresh call exproject#refresh_current_folder()
