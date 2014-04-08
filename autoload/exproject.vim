@@ -459,7 +459,7 @@ function exproject#confirm_select(modifier)
 
     " simplify the file name
     let fullpath = fnamemodify( fullpath, ':p' )
-    let fullpath = escape(fullpath,' ')
+    let fullpath = fnameescape(fullpath)
 
     " switch filetype
     let filetype = fnamemodify( fullpath, ':e' )
@@ -659,7 +659,7 @@ function exproject#refresh_current_folder()
     " simplify the file name
     let full_path_name = fnamemodify( full_path_name, ':p' )
     " do not escape, or the directory with white-space can't be found
-    "let full_path_name = escape(simplify(full_path_name),' ')
+    "let full_path_name = fnameescape(simplify(full_path_name))
     let full_path_name = strpart( full_path_name, 0, strlen(full_path_name)-1 )
     echon "ex-project: Refresh folder: " . full_path_name . "\r"
 
