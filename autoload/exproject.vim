@@ -351,6 +351,10 @@ function exproject#open_window()
     endif
     call ex#window#goto_edit_window()
 
+    if s:cur_project_file == ""
+        let s:cur_project_file = g:ex_project_file
+    endif
+
     let winnr = bufwinnr(s:cur_project_file)
     if winnr == -1
         call ex#window#open( 
