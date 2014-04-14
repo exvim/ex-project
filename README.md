@@ -1,6 +1,17 @@
 # Intro
 
-Project browser for exVim
+ex-project is a file browser focus on your current working directory. It provides a tree view
+window and allow you to manipulate folders and files directly in it. 
+
+Many Vim users thought ex-project might be another NERDTree. But they have different scope. 
+ex-project is more focus on your current project ( or working directory ). It provides folder
+and file filter with it and building the whole project tree very fast first time you working the
+project. It also allow you create folders, files directly in the tree view window. 
+
+More on that, ex-project can be working with NERDTree by its swap function. With it, you are
+freely change the plugin window betwee ex-project and NERDTree.
+
+![ex-project-window](http://exvim.github.io/images/ext/ex-project-window.png)
 
 ## Requirements
 
@@ -32,4 +43,6 @@ To install using [NeoBundle](https://github.com/Shougo/neobundle.vim):
     cd ~/.vim
     unzip ex-project-master.zip
     copy all of the files into your ~/.vim directory
+
+## Usage
 
