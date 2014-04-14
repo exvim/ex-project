@@ -3,13 +3,12 @@
 ex-project is a file browser focus on your current working directory. It provides a tree view
 window and allow you to manipulate folders and files directly in it. 
 
-Many Vim users thought ex-project might be another NERDTree. But they have different scope. 
+Many Vim users thought ex-project is yet another NERDTree. But actually they have different scope. 
 ex-project is more focus on your current project ( or working directory ). It provides folder
 and file filter with it and building the whole project tree very fast first time you working the
 project. It also allow you create folders, files directly in the tree view window. 
 
-More on that, ex-project can be working with NERDTree by its swap function. With it, you are
-freely change the plugin window betwee ex-project and NERDTree.
+More over that, ex-project can be working with NERDTree seamlessly by its window swapping functions.
 
 ![ex-project-window](http://exvim.github.io/images/ext/ex-project-window.png)
 
@@ -20,7 +19,10 @@ freely change the plugin window betwee ex-project and NERDTree.
 
 ## Installation
 
-This plugin follows the standard runtime path structure, and as such it can 
+ex-project is written based on [exvim/ex-utility](https://github.com/exvim/ex-utility). This 
+is the basic library of ex-vim-plugins. Follow the readme file in ex-utility to install it first.
+
+ex-project follows the standard runtime path structure, and as such it can 
 be installed with a variety of plugin managers:
     
 To install using [Vundle](https://github.com/gmarik/vundle):
@@ -45,4 +47,10 @@ To install using [NeoBundle](https://github.com/Shougo/neobundle.vim):
     copy all of the files into your ~/.vim directory
 
 ## Usage
+
+Open your Vim, type `:EXProject your_project_file.exproject` create your project.
+Go to the project window and type `<leader>R` to build the project tree. Now you 
+can start your project!
+
+More details, check `:help exproject`.
 
