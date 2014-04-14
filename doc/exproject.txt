@@ -1,0 +1,185 @@
+*exproject.txt*    A file browser focus on your current working directory.
+
+Author:         Johnny Wu <karasaya@gmail.com>
+Licence:        MIT licence
+Homepage:       http://exvim.github.io/
+Version:        0.1.0
+
+==============================================================================
+Contents                                         *exproject*  *exproject-contents*
+
+         1. Intro ........................... |exproject-intro|
+         2. Requirements .................... |exproject-requirements|
+         3. Usage ........................... |exproject-usage|
+              Commands ...................... |exproject-commands|
+              Key mappings .................. |exproject-mappings|
+         4. Configuration ................... |exproject-configuration|
+              Highlight colours ............. |exproject-highlighting|
+         5. Extending Easyhl ................ |exproject-extend|
+         6. Troubleshooting & Known issues .. |exproject-issues|
+         7. History ......................... |exproject-history|
+
+==============================================================================
+1. Intro                                                        *exproject-intro*
+
+ex-project is a file browser focus on your current working directory. 
+It provides a tree view window and allow you to manipulate folders and files 
+directly in it. 
+
+Many Vim users thought ex-project is yet another NERDTree. But actually they 
+have different scope. ex-project is more focus on your current project 
+( or working directory ). It provides folder and file filter with it and 
+building the whole project tree very fast first time you working the project. 
+It also allow you create folders, files directly in the tree view window. 
+
+More over that, ex-project can be working with NERDTree seamlessly by its window 
+swapping functions.
+
+==============================================================================
+2. Requirements                                          *exproject-requirements*
+
+The following requirements have to be met in order to be able to use exproject:
+
+  - Vim 6.0 or higher
+  - ex-utility: (https://github.com/exvim/ex-utility) 
+
+==============================================================================
+3. Usage                                                        *exproject-usage*
+
+Create new project file ~
+
+Go to your working project, open the Vim. Type |:EXProject|
+`your_project_file.exproject`. You will see a project window open. Go to the 
+project window and type |<leader>R| to build your file tree.
+
+------------------------------------------------------------------------------
+COMMANDS                                                 *exproject-commands*
+
+:EXProject {file}                                                   *:EXProject*
+    Open project {file} in ex-project winow.
+
+:EXProjectOpen                                                  *:EXProjectOpen*
+    Open ex-project window.
+
+:EXProjectClose                                                *:EXProjectClose*
+    Close ex-project window.
+
+:EXProjectToggle                                              *:EXProjectToggle*
+    Toggle ex-project window.
+
+:EXProjectBuild                                                *:EXProjectBuild*
+    Build project tree.
+
+:EXProjectFind                                                  *:EXProjectFind*
+    Find current edit file in project tree.
+
+:EXProjectRefresh                                            *:EXProjectRefresh*
+    Recursively refresh current folder in project tree.
+
+------------------------------------------------------------------------------
+KEY MAPPINGS                                                *exproject-mappings*
+
+Default key mappings:
+
+                                                                *'easyhl-<a-1>'*
+<Atl-1>        
+    Highlight current words on label 1, toggle highlight when same word meets
+
+                                                                *'easyhl-<a-2>'*
+<Atl-2>
+    Highlight current words on label 2, toggle highlight when same word meets 
+
+                                                                *'easyhl-<a-3>'*
+<Atl-3>
+    Highlight current words on label 3, toggle highlight when same word meets 
+
+                                                                *'easyhl-<a-4>'*
+<Atl-4>
+    Highlight current words on label 4, toggle highlight when same word meets 
+
+                                                                *'easyhl-<a-0>'*
+<Atl-0>
+    Cancel highlight all labels
+
+                                                            *'easyhl-<leader>1'*
+<Leader>1
+    Cancel highlight label 1
+
+                                                            *'easyhl-<leader>2'*
+<Leader>2
+    Cancel highlight label 2
+
+                                                            *'easyhl-<leader>3'*
+<Leader>3
+    Cancel highlight label 3
+
+                                                            *'easyhl-<leader>4'*
+<Leader>4
+    Cancel highlight label 4
+
+                                                          *'easyhl-<leader>sub'*
+<Leader>sub
+    Replace label 1 highlight words with label 2 highlight words
+
+
+==============================================================================
+4. Configuration                                        *exproject-configuration*
+
+                                                    *g:ex_easyhl_auto_cursorhl*
+g:ex_easyhl_auto_cursorhl~
+Default: 0
+
+By default the cursor higlight is turn off.  use this option to turn on 
+cursor highlight, when cursor stay for several seconds, the word under cursor
+will be highlighted.
+
+------------------------------------------------------------------------------
+HIGHLIGHT COLOURS                                           *exproject-highlight*
+
+All of the colours used by exproject can be customized. Here is a list of the
+highlight groups that are defined by Tagbar:
+
+    hi default ex_easyhl_cursorhl gui=none guibg=White term=none cterm=none ctermbg=white 
+    hi default ex_easyhl1 gui=none guibg=LightCyan term=none cterm=none ctermbg=lightcyan
+    hi default ex_easyhl2 gui=none guibg=LightMagenta term=none cterm=none ctermbg=lightmagenta
+    hi default ex_easyhl3 gui=none guibg=LightRed term=none cterm=none ctermbg=lightred
+    hi default ex_easyhl4 gui=none guibg=LightGreen term=none cterm=none ctermbg=lightgreen
+
+ex_easyhl_cursorhl~
+    Cursor highlight
+
+ex_easyhl1~
+    Label 1
+
+ex_easyhl2~
+    Label 2
+
+ex_easyhl3~
+    Label 3
+
+ex_easyhl4~
+    Label 4
+
+If you want to change any of those colours put a line like the following in
+your vimrc:
+>
+    hi ex_easyhl4 guifg=Green ctermfg=Green
+<
+See |:highlight| for more information.
+
+==============================================================================
+5. Extending exproject                                            *exproject-extend*
+
+
+==============================================================================
+6. Troubleshooting & Known issues                              *exproject-issues*
+
+
+==============================================================================
+7. History                                                    *exproject-history*
+
+1.0.0 (2014-03-19)
+    - Initial release
+
+==============================================================================
+ vim: tw=78 ts=8 sw=4 sts=4 et ft=help
