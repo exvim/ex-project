@@ -127,62 +127,84 @@ O
 
 
 ==============================================================================
-4. Configuration                                        *exproject-configuration*
+4. Configuration                                       *exproject-configuration*
 
-                                                    *g:ex_easyhl_auto_cursorhl*
-g:ex_easyhl_auto_cursorhl~
-Default: 0
+                                                             *g:ex_project_file*
+g:ex_project_file~
+Default: './files.exproject'
 
-By default the cursor higlight is turn off.  use this option to turn on 
-cursor highlight, when cursor stay for several seconds, the word under cursor
-will be highlighted.
+The default path of the project file. When you open the project window and
+no project file specified, it will use this value as default project file path.
+
+
+                                                          *g:ex_project_winsize*
+g:ex_project_winsize~
+Default: 30
+
+The window size of project window.  
+
+                                                     *g:ex_project_winsize_zoom*
+g:ex_project_winsize_zoom~
+Default: 60
+
+The zoomed size of project window.
+
+                                                           *g:ex_project_winpos*
+g:ex_project_winpos~
+Default: 'left'
+Options: 'left', 'right', 'top', 'bottom'
+
+The position of project window.
 
 ------------------------------------------------------------------------------
-HIGHLIGHT COLOURS                                           *exproject-highlight*
+HIGHLIGHT COLOURS                                       *exproject-highlighting*
 
-All of the colours used by exproject can be customized. Here is a list of the
-highlight groups that are defined by Tagbar:
+ex_pj_help~
+    Help text
 
-    hi default ex_easyhl_cursorhl gui=none guibg=White term=none cterm=none ctermbg=white 
-    hi default ex_easyhl1 gui=none guibg=LightCyan term=none cterm=none ctermbg=lightcyan
-    hi default ex_easyhl2 gui=none guibg=LightMagenta term=none cterm=none ctermbg=lightmagenta
-    hi default ex_easyhl3 gui=none guibg=LightRed term=none cterm=none ctermbg=lightred
-    hi default ex_easyhl4 gui=none guibg=LightGreen term=none cterm=none ctermbg=lightgreen
+ex_pj_help_key~
+    Help mappings
 
-ex_easyhl_cursorhl~
-    Cursor highlight
+ex_pj_help_comma~
+    Help comma
 
-ex_easyhl1~
-    Label 1
+ex_pj_fold~
+    Folder
 
-ex_easyhl2~
-    Label 2
+ex_pj_tree_line~
+    Tree line
 
-ex_easyhl3~
-    Label 3
+ex_pj_file_name~
+    File name
 
-ex_easyhl4~
-    Label 4
+ex_pj_ft_exvim~
+    .exvim file
+
+ex_pj_ft_error~
+    .err file
 
 If you want to change any of those colours put a line like the following in
 your vimrc:
 >
-    hi ex_easyhl4 guifg=Green ctermfg=Green
+    hi ex_pj_fold guifg=Green ctermfg=Green
 <
 See |:highlight| for more information.
 
 ==============================================================================
-5. Extending exproject                                            *exproject-extend*
+5. Extending exproject                                        *exproject-extend*
+
+TODO
+exproject#register_hotkey()
 
 
 ==============================================================================
-6. Troubleshooting & Known issues                              *exproject-issues*
+6. Troubleshooting & Known issues                             *exproject-issues*
 
 
 ==============================================================================
-7. History                                                    *exproject-history*
+7. History                                                   *exproject-history*
 
-1.0.0 (2014-03-19)
+0.1.0 (2014-04-14)
     - Initial release
 
 ==============================================================================
