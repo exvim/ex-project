@@ -81,45 +81,49 @@ KEY MAPPINGS                                                *exproject-mappings*
 
 Default key mappings:
 
-                                                                *'easyhl-<a-1>'*
-<Atl-1>        
-    Highlight current words on label 1, toggle highlight when same word meets
+                                                              *'exproject-<F1>'*
+<F1>        
+    Toggle Help    
 
-                                                                *'easyhl-<a-2>'*
-<Atl-2>
-    Highlight current words on label 2, toggle highlight when same word meets 
+                                                           *'exproject-<Space>'*
+<Space>
+    Zoom in/out project window
 
-                                                                *'easyhl-<a-3>'*
-<Atl-3>
-    Highlight current words on label 3, toggle highlight when same word meets 
+                                                              *'exproject-<CR>'*
+                                                     *'exproject-<2-LeftMouse>'*
+<CR> or <2-LeftMouse>
+    When cursor on a file, it will open it in edit window.
+    When cursor on a folder, it will fold in/out the folder.
 
-                                                                *'easyhl-<a-4>'*
-<Atl-4>
-    Highlight current words on label 4, toggle highlight when same word meets 
+                                                            *'exproject-<S-CR>'*
+                                                   *'exproject-<S-2-LeftMouse>'*
+<S-CR> or <S-2-LeftMouse>
+    When cursor on a file, it will open it in edit window splitted.
+    When cursor on a folder, it will open the folder path in OS's file explorer
+    
 
-                                                                *'easyhl-<a-0>'*
-<Atl-0>
-    Cancel highlight all labels
+                                                         *'exproject-<leader>R'*
+<leader>R
+    Rebuild the project tree
 
-                                                            *'easyhl-<leader>1'*
-<Leader>1
-    Cancel highlight label 1
+                                                         *'exproject-<leader>r'*
+<leader>r
+    Refresh current folder your cursor in.
 
-                                                            *'easyhl-<leader>2'*
-<Leader>2
-    Cancel highlight label 2
+                                                                 *'exproject-o'*
+o
+    Create new file. The cursor must in a file or folder line. 
 
-                                                            *'easyhl-<leader>3'*
-<Leader>3
-    Cancel highlight label 3
+                                                                 *'exproject-O'*
+O
+    Create new folder. The cursor must in a folder line. When start create,
+    exproject will ask you to input the new folder name.
 
-                                                            *'easyhl-<leader>4'*
-<Leader>4
-    Cancel highlight label 4
-
-                                                          *'easyhl-<leader>sub'*
-<Leader>sub
-    Replace label 1 highlight words with label 2 highlight words
+                                                           *'exproject-<C-Tab>'*
+<C-Tab>
+    Switch between NERDTree and exproject. To make it work, your Vim must have
+    NERDTree installed. exproject will add keymapping of <C-Tab> in NERDTree
+    when it detect the plugin after Vim started.
 
 
 ==============================================================================
