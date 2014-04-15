@@ -193,9 +193,11 @@ See |:highlight| for more information.
 ==============================================================================
 5. Extending exproject                                        *exproject-extend*
 
-TODO
-exproject#register_hotkey()
-
+					      	   *exproject#register_hotkey()*
+exproject#register_hotkey( priority, key, action, desc )
+    Register your key-mapping by {key} in ex-project window. The {key} will 
+    execute function you define in {action}. The {priority} will sort your
+    {key} and {desc} in the help context in ex-project window.
 
 ==============================================================================
 6. Troubleshooting & Known issues                             *exproject-issues*
