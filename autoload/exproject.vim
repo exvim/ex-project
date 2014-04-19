@@ -299,6 +299,7 @@ function exproject#toggle_help()
     call s:update_help_text()
     silent call append ( 0, s:help_text )
     silent keepjumps normal! gg
+    call ex#hl#clear_confirm()
 endfunction
 
 " exproject#open {{{2
@@ -329,7 +330,9 @@ endfunction
 " exproject#open_window {{{2
 
 function exproject#init_buffer()
-    " NOTE: this maybe a BUG of Vim.
+    " NOTE: ex-project window open can happen during VimEnter. According to  
+    " Vim's documentation, event such as BufEnter, WinEnter will not be triggered
+    " during VimEnter.
     " When I open exproject window and read the file through vimentry scripts,
     " the events define in exproject/ftdetect/exproject.vim will not execute.
     " I guess this is because when you are in BufEnter event( the .vimentry
@@ -337,11 +340,20 @@ function exproject#init_buffer()
     " buffers' event 
     " This is why I set the filetype manually here. 
     set filetype=exproject
+    au! BufWinLeave <buffer> call <SID>on_close()
 
     if ( line('$') <= 1 )
         silent call append ( 0, s:help_text )
         silent exec '$d'
     endif
+endfunction
+
+function s:on_close()
+    let s:zoom_in = 0
+    let s:help_open = 0
+
+    " go back to edit buffer
+    call ex#window#goto_edit_window()
 endfunction
 
 function exproject#open_window()
