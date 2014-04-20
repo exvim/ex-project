@@ -16,6 +16,10 @@ if !exists('g:ex_project_winpos')
     let g:ex_project_winpos = 'left'
 endif
 
+if !exists('g:ex_project_enable_help')
+    let g:ex_project_enable_help = 1
+endif
+
 "}}}
 
 " commands {{{1

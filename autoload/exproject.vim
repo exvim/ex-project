@@ -294,6 +294,10 @@ function s:update_help_text()
 endfunction
 
 function exproject#toggle_help()
+    if !g:ex_project_enable_help
+        return
+    endif
+
     let s:help_open = !s:help_open
     silent exec '1,' . len(s:help_text) . 'd _'
     call s:update_help_text()
@@ -342,7 +346,7 @@ function exproject#init_buffer()
     set filetype=exproject
     au! BufWinLeave <buffer> call <SID>on_close()
 
-    if ( line('$') <= 1 )
+    if line('$') <= 1 && g:ex_project_enable_help
         silent call append ( 0, s:help_text )
         silent exec '$d'
     endif
@@ -544,7 +548,9 @@ function exproject#build_tree()
     silent keepjumps normal! gg
 
     " add online help 
-    silent call append ( 0, s:help_text )
+    if g:ex_project_enable_help
+        silent call append ( 0, s:help_text )
+    endif
 
     " save the build
     silent exec 'w!'
