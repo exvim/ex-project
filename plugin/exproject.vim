@@ -55,4 +55,7 @@ call exproject#register_hotkey( 10 , 'O'               , ":call exproject#newfol
 " nnoremap <silent> <buffer> <c-j> :call exUtility#CursorJump( '\C\[F\]', 'down' )<CR>
 "}}}
 
+call ex#register_plugin( 'exproject', {} )
+call ex#register_plugin( 'nerdtree', { 'bufname': 'NERD_tree_\d\+', 'buftype': 'nofile' } )
+
 " vim:ts=4:sw=4:sts=4 et fdm=marker:
