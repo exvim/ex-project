@@ -56,7 +56,8 @@ project window and type |<leader>R| to build your file tree.
 COMMANDS                                                  *exproject-commands*
 
 :EXProject {file}                                                 *:EXProject*
-    Open project {file} in ex-project winow.
+    Open project {file} in ex-project winow. If no {file} provide, exproject
+    will use ./files.exproject as default. 
 
 :EXProjectOpen                                                *:EXProjectOpen*
     Open ex-project window.

@@ -23,7 +23,7 @@ endif
 "}}}
 
 " commands {{{1
-command! -n=1 -complete=file EXProject call exproject#open('<args>')
+command! -n=? -complete=file EXProject call exproject#open('<args>')
 command! EXProjectOpen call exproject#open_window()
 command! EXProjectClose call exproject#close_window()
 command! EXProjectToggle call exproject#toggle_window()
