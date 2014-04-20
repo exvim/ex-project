@@ -7,15 +7,21 @@ if exists ( ':NERDTreeToggle' ) && exists( ':EXProjectOpen' )
         exec 'NERDTreeToggle'
         " exec 'NERDTreeFind'
 
-        nunmap <leader>fc
+        if mapcheck('<leader>fc','n') != ""
+            nunmap <leader>fc
+        endif
         nnoremap <unique> <leader>fc :NERDTreeFind<CR>
 
         if has('gui_running') "  the <alt> key is only available in gui mode.
             if has ('mac')
-                nunmap Ø
+                if mapcheck('Ø','n') != ""
+                    nunmap Ø
+                endif
                 nnoremap <unique> Ø :NERDTreeFind<CR>:redraw<CR>/
             else
-                nunmap <M-O>
+                if mapcheck('<M-O>','n') != ""
+                    nunmap <M-O>
+                endif
                 nnoremap <unique> <M-O> :NERDTreeFind<CR>:redraw<CR>/
             endif
         endif
@@ -34,15 +40,21 @@ if exists ( ':NERDTreeToggle' ) && exists( ':EXProjectOpen' )
         exec 'EXProjectOpen'
         " exec 'EXProjectFind'
 
-        nunmap <leader>fc
+        if mapcheck('<leader>fc','n') != ""
+            nunmap <leader>fc
+        endif
         nnoremap <unique> <leader>fc :EXProjectFind<CR>
 
         if has('gui_running')
             if has ('mac')
-                nunmap Ø
+                if mapcheck('Ø','n') != ""
+                    nunmap Ø
+                endif
                 nnoremap <unique> Ø :EXProjectOpen<CR>:redraw<CR>/
             else
-                nunmap <M-O>
+                if mapcheck('<M-O>','n') != ""
+                    nunmap <M-O>
+                endif
                 nnoremap <unique> <M-O> :EXProjectOpen<CR>:redraw<CR>/
             endif
         endif
