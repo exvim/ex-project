@@ -12,6 +12,8 @@ More over that, ex-project can be working with NERDTree seamlessly by its window
 
 ![ex-project-window](http://exvim.github.io/images/ext/ex-project-window.png)
 
+ex-project is part of [exVim](https://github.com/exvim/main) project
+
 ## Requirements
 
 - Vim 6.0 or higher.
@@ -19,8 +21,12 @@ More over that, ex-project can be working with NERDTree seamlessly by its window
 
 ## Installation
 
+### Install ex-utility
+
 ex-project is written based on [exvim/ex-utility](https://github.com/exvim/ex-utility). This 
 is the basic library of ex-vim-plugins. Follow the readme file in ex-utility to install it first.
+
+### Install ex-project
 
 ex-project follows the standard runtime path structure, and as such it can 
 be installed with a variety of plugin managers:
