@@ -32,13 +32,14 @@ have different scope. ex-project is more focus on your current project
 building the whole project tree very fast first time you working the project. 
 It also allow you create folders, files directly in the tree view window. 
 
-More over that, ex-project can be working with NERDTree seamlessly by its window 
-swapping functions.
+More over that, ex-project can be working with NERDTree seamlessly by its 
+window swapping functions.
 
 ==============================================================================
 2. Requirements                                       *exproject-requirements*
 
-The following requirements have to be met in order to be able to use exproject:
+The following requirements have to be met in order to be able to use 
+exproject:
 
   - Vim 6.0 or higher
   - ex-utility: (https://github.com/exvim/ex-utility) 
@@ -100,7 +101,8 @@ Default key mappings:
                                                  *'exproject-<S-2-LeftMouse>'*
 <S-CR> or <S-2-LeftMouse>
     When cursor on a file, it will open it in edit window splitted.
-    When cursor on a folder, it will open the folder path in OS's file explorer
+    When cursor on a folder, it will open the folder path in OS's file 
+    explorer
     
 
                                                        *'exproject-<leader>R'*
@@ -122,9 +124,9 @@ O
 
                                                          *'exproject-<C-Tab>'*
 <C-Tab>
-    Switch between NERDTree and exproject. To make it work, your Vim must have
-    NERDTree installed. exproject will add keymapping of <C-Tab> in NERDTree
-    when it detect the plugin after Vim started.
+    Switch between NERDTree and exproject. To make it work, your Vim must 
+    have NERDTree installed. exproject will add keymapping of <C-Tab> in 
+    NERDTree when it detect the plugin after Vim started.
 
 
 ==============================================================================
@@ -135,8 +137,8 @@ g:ex_project_file~
 Default: './files.exproject'
 
 The default path of the project file. When you open the project window and
-no project file specified, it will use this value as default project file path.
-
+no project file specified, it will use this value as default project file 
+path.
 
                                                         *g:ex_project_winsize*
 g:ex_project_winsize~
@@ -236,15 +238,15 @@ exproject#set_folder_filter_mode({mode})
                                               *exproject#set_folder_filters()*
 exproject#set_folder_filters({filters})
     Set folder filters for ex-project. The {filters} is a string array which
-    stores the first-level folder names. If filter mode is 'include', it will 
-    show the folders in {filters}. If filter mode is 'exclude', it *will not* 
-    show the folders in {fitlers}.
+    stores the first-level folder names. If filter mode is 'include', it 
+    will show the folders in {filters}. If filter mode is 'exclude', it 
+    *will not* show the folders in {fitlers}. 
     For example:
 >
         call exproject#set_folder_filters(['src','include'])
 <
-    The script above will make ex-project only show 'src' and 'inlucde' folder
-    unders the root directory if filter mode is set to 'include'.
+    The script above will make ex-project only show 'src' and 'inlucde' 
+    folder unders the root directory if filter mode is set to 'include'.
 
 ==============================================================================
 6. Troubleshooting & Known issues                           *exproject-issues*
