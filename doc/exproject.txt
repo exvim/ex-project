@@ -15,7 +15,7 @@ Contents                                       *exproject*  *exproject-contents*
               Key mappings .................. |exproject-mappings|
          4. Configuration ................... |exproject-configuration|
               Highlight colours ............. |exproject-highlighting|
-         5. Extending Easyhl ................ |exproject-extend|
+         5. Functions ....................... |exproject-functions|
          6. Troubleshooting & Known issues .. |exproject-issues|
          7. History ......................... |exproject-history|
 
@@ -198,13 +198,53 @@ your vimrc:
 See |:highlight| for more information.
 
 ==============================================================================
-5. Extending exproject                                      *exproject-extend*
+5. Functions                                             *exproject-functions*
 
                                                  *exproject#register_hotkey()*
-exproject#register_hotkey( priority, key, action, desc )
+exproject#register_hotkey({priority}, {key}, {action}, {desc})
     Register your key-mapping by {key} in ex-project window. The {key} will 
     execute function you define in {action}. The {priority} will sort your
     {key} and {desc} in the help context in ex-project window.
+
+                                               *exproject#find_current_edit()*
+exproject#find_current_edit({focus})
+    Find current edit file and locate the cursor to it in project window. If
+    {focus} is 1, the cursor will jump to project window, otherwise it will
+    stay in current buffer.
+
+                                                *exproject#set_file_filters()*
+exproject#set_file_filters({filters})
+    Set file filters for ex-project. The {filters} is a file suffix array.
+    For example:
+>
+        call exproject#set_file_filters(['c','cpp','h'])
+<
+    The script above will make ex-project only show files with `.c`, `.cpp` 
+    and `.h` suffix.
+
+                                        *exproject#set_file_ignore_patterns()*
+exproject#set_file_ignore_patterns({patterns})
+
+    TODO: have not implemented yet
+
+                                          *exproject#set_folder_filter_mode()*
+exproject#set_folder_filter_mode({mode})
+    Set folder filter mode. The {mode} accept value 'include' or 'exclude'. 
+    The mode will be used as filter method for folder fitler setted by 
+    |exproject#set_folder_filters()|.
+
+                                              *exproject#set_folder_filters()*
+exproject#set_folder_filters({filters})
+    Set folder filters for ex-project. The {filters} is a string array which
+    stores the first-level folder names. If filter mode is 'include', it will 
+    show the folders in {filters}. If filter mode is 'exclude', it *will not* 
+    show the folders in {fitlers}.
+    For example:
+>
+        call exproject#set_folder_filters(['src','include'])
+<
+    The script above will make ex-project only show 'src' and 'inlucde' folder
+    unders the root directory if filter mode is set to 'include'.
 
 ==============================================================================
 6. Troubleshooting & Known issues                           *exproject-issues*
