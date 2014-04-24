@@ -12,7 +12,7 @@ More over that, ex-project can be working with NERDTree seamlessly by its window
 
 ![ex-project-window](http://exvim.github.io/images/ext/ex-project-window.png)
 
-ex-project is part of [exVim](https://github.com/exvim/main) project
+ex-project is also a part of [exVim](https://github.com/exvim/main) project
 
 ## Requirements
 
