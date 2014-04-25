@@ -9,10 +9,9 @@ silent! setlocal nowrap
 silent! setlocal statusline=
 
 silent! setlocal foldenable
-silent! setlocal foldmethod=marker foldmarker={,} foldlevel=1
+silent! setlocal foldmethod=marker foldmarker={,}
 silent! setlocal foldtext=exproject#foldtext()
 silent! setlocal foldminlines=0
-silent! setlocal foldlevel=9999
 " }}}1
 
 " Key Mappings Binding {{{1
