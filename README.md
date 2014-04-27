@@ -1,3 +1,13 @@
+- - -
+- [Intro](#intro)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Usage](#usage)
+
+For more details, check [exVim's Docs: Project-Window Usage](http://exvim.github.io/docs/project-window/)
+
+- - -
+
 # Intro
 
 ex-project is a file browser focus on your current working directory. It provides a tree view
@@ -12,7 +22,7 @@ More over that, ex-project can be working with NERDTree seamlessly by its window
 
 ![ex-project-window](http://exvim.github.io/images/ext/ex-project-window.png)
 
-ex-project is also a part of [exVim](https://github.com/exvim/main) project
+ex-project is also a part of [exVim](https://github.com/exvim/main) project.
 
 ## Requirements
 
@@ -58,5 +68,6 @@ Open your Vim, type `:EXProject your_project_file.exproject` create your project
 Go to the project window and type `<leader>R` to build the project tree. Now you 
 can start your project!
 
-More details, check `:help exproject`.
+More details, check [exVim's Docs: Project-Window Usage](http://exvim.github.io/docs/project-window/) 
+and `:help exproject` in Vim.
 
