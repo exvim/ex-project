@@ -103,6 +103,15 @@ Default key mappings:
     When cursor on a file, it will open it in edit window splitted.
     When cursor on a folder, it will open the folder path in OS's file 
     explorer
+
+
+                                                           *'exproject-<C-k>'*
+<C-k>
+    Move cursor up to the nearest folder
+
+                                                           *'exproject-<C-j>'*
+<C-j>
+    Move cursor down to the nearest folder
     
 
                                                        *'exproject-<leader>R'*

@@ -856,6 +856,27 @@ function exproject#newfolder()
     let @t = reg_t
 endfunction
 
+" exproject#cursor_jump {{{2
+function exproject#cursor_jump ( search_pattern, search_direction )
+    let save_cursor = getpos(".")
+
+    " get search flags, also move cursors
+    let search_flags = ''
+    if a:search_direction == 'up'
+        let search_flags  = 'bW'
+        silent exec 'normal ^'
+    else
+        let search_flags  = 'W'
+        silent exec 'normal $'
+    endif
+
+    " jump to error,warning pattern
+    let jump_line = search(a:search_pattern, search_flags )
+    if jump_line == 0
+        silent call setpos(".", save_cursor)
+    endif
+endfunction
+
 " }}}1
 
 " vim:ts=4:sw=4:sts=4 et fdm=marker:

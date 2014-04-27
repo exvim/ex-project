@@ -33,26 +33,21 @@ command! EXProjectRefresh call exproject#refresh_current_folder()
 "}}}
 
 " default key mappings {{{1
-call exproject#register_hotkey( 1  , '<F1>'            , ":call exproject#toggle_help()<CR>"           , 'Toggle help.' )
-call exproject#register_hotkey( 2  , '<Space>'         , ":call exproject#toggle_zoom()<CR>"           , 'Zoom in/out project window.' )
-call exproject#register_hotkey( 3  , '<CR>'            , ":call exproject#confirm_select('')<CR>"      , 'File: Open it. Folder: Fold in/out.' )
-call exproject#register_hotkey( 4  , '<2-LeftMouse>'   , ":call exproject#confirm_select('')<CR>"      , 'File: Open it. Folder: Fold in/out.' )
-call exproject#register_hotkey( 5  , '<S-CR>'          , ":call exproject#confirm_select('shift')<CR>" , 'File: Split and open it. Folder: Open the folder in os file browser.' )
-call exproject#register_hotkey( 6  , '<S-2-LeftMouse>' , ":call exproject#confirm_select('shift')<CR>" , 'File: Split and open it. Folder: Open the folder in os file browser.' )
-call exproject#register_hotkey( 7  , '<leader>R'       , ":EXProjectBuild<CR>"                         , 'Rebuild project tree.' )
-call exproject#register_hotkey( 8  , '<leader>r'       , ":EXProjectRefresh<CR>"                       , 'Refresh current folder.' )
-call exproject#register_hotkey( 9  , 'o'               , ":call exproject#newfile()<CR>"               , 'Create new file.' )
-call exproject#register_hotkey( 10 , 'O'               , ":call exproject#newfolder()<CR>"             , 'Create new folder.' )
+call exproject#register_hotkey( 1  , '<F1>'            , ":call exproject#toggle_help()<CR>"                        , 'Toggle help.' )
+call exproject#register_hotkey( 2  , '<Space>'         , ":call exproject#toggle_zoom()<CR>"                        , 'Zoom in/out project window.' )
+call exproject#register_hotkey( 3  , '<CR>'            , ":call exproject#confirm_select('')<CR>"                   , 'File: Open it. Folder: Fold in/out.' )
+call exproject#register_hotkey( 4  , '<2-LeftMouse>'   , ":call exproject#confirm_select('')<CR>"                   , 'File: Open it. Folder: Fold in/out.' )
+call exproject#register_hotkey( 5  , '<S-CR>'          , ":call exproject#confirm_select('shift')<CR>"              , 'File: Split and open it. Folder: Open the folder in os file browser.' )
+call exproject#register_hotkey( 6  , '<S-2-LeftMouse>' , ":call exproject#confirm_select('shift')<CR>"              , 'File: Split and open it. Folder: Open the folder in os file browser.' )
+call exproject#register_hotkey( 7  , '<C-k>'           , ":call exproject#cursor_jump( '\\C\\[F\\]', 'up' )<CR>"    , 'Move cursor up to the nearest folder.' )
+call exproject#register_hotkey( 8  , '<C-j>'           , ":call exproject#cursor_jump( '\\C\\[F\\]', 'down' )<CR>"  , 'Move cursor down to the nearest folder.' )
+call exproject#register_hotkey( 9  , '<leader>R'       , ":EXProjectBuild<CR>"                                      , 'Rebuild project tree.' )
+call exproject#register_hotkey( 10 , '<leader>r'       , ":EXProjectRefresh<CR>"                                    , 'Refresh current folder.' )
+call exproject#register_hotkey( 11 , 'o'               , ":call exproject#newfile()<CR>"                            , 'Create new file.' )
+call exproject#register_hotkey( 12 , 'O'               , ":call exproject#newfolder()<CR>"                          , 'Create new folder.' )
 
 " TODO:
 " nnoremap <silent> <buffer> <leader>e    :call <SID>exPJ_EchoPath()<CR>
-
-" "
-" nnoremap <silent> <buffer> <c-up> :call exUtility#CursorJump( 'ErrorLog.err', 'up' )<CR>
-" nnoremap <silent> <buffer> <c-down> :call exUtility#CursorJump( 'ErrorLog.err', 'down' )<CR>
-
-" nnoremap <silent> <buffer> <c-k> :call exUtility#CursorJump( '\C\[F\]', 'up' )<CR>
-" nnoremap <silent> <buffer> <c-j> :call exUtility#CursorJump( '\C\[F\]', 'down' )<CR>
 "}}}
 
 call ex#register_plugin( 'exproject', {} )
