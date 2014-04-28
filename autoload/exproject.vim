@@ -349,12 +349,15 @@ function exproject#init_buffer()
     if line('$') <= 1 && g:ex_project_enable_help
         silent call append ( 0, s:help_text )
         silent exec '$d'
+    else
+        silent loadview
     endif
 endfunction
 
 function s:on_close()
     let s:zoom_in = 0
     let s:help_open = 0
+    silent mkview
 
     " go back to edit buffer
     call ex#window#goto_edit_window()
