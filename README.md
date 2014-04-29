@@ -3,10 +3,10 @@
 - [Requirements](#requirements)
 - [Installation](#installation)
   - [Install ex-utility](#install-ex-utility)
-  - [Install id-utils](#install-ex-project)
+  - [Install ex-project](#install-ex-project)
 - [Usage](#usage)
 
-For more details, check [exVim's Docs: Project-Window Usage](http://exvim.github.io/docs/project-window)
+For more details, check [exVim's Docs: Project Window](http://exvim.github.io/docs/project-window)
 
 - - -
 
