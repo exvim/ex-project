@@ -184,7 +184,7 @@ function s:build_tree( entry_path, file_pattern, folder_pattern, folder_include,
             if s:build_tree(
                         \ file_list[list_idx],
                         \ a:file_pattern,
-                        \ '',
+                        \ s:folder_filter_root_only ? '' : a:folder_pattern,
                         \ a:folder_include,
                         \ a:filename_list
                         \ ) == 1
@@ -749,6 +749,11 @@ endfunction
 " exproject#set_folder_filter_mode {{{2
 function exproject#set_folder_filter_mode( mode )
     let s:folder_filter_include = (a:mode == 'include')
+endfunction
+
+" exproject#set_folder_root_only {{{2
+function exproject#set_folder_root_only( root_only)
+    let s:folder_filter_root_only = (a:root_only == 'true')
 endfunction
 
 " exproject#newfile {{{2
