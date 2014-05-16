@@ -279,8 +279,8 @@ function exproject#bind_mappings()
 endfunction
 
 " exproject#register_hotkey {{{2
-function exproject#register_hotkey( priority, key, action, desc )
-    call ex#keymap#register( s:keymap, a:priority, a:key, a:action, a:desc )
+function exproject#register_hotkey( priority, local, key, action, desc )
+    call ex#keymap#register( s:keymap, a:priority, a:local, a:key, a:action, a:desc )
 endfunction
 
 " exproject#toggle_help {{{2
