@@ -5,6 +5,7 @@ let s:file_filters = []
 let s:file_ignore_patterns = []
 let s:folder_filters = []
 let s:folder_filter_include = 1
+let s:folder_filter_root_only = 1
 
 let s:zoom_in = 0
 let s:keymap = {}
@@ -699,7 +700,13 @@ function exproject#refresh_current_folder()
     " start broswing
     let filename_list = []
     let file_filter_pattern = ex#pattern#last_words(s:file_filters)
-    let foder_filter_patern = is_root ? ex#pattern#last_words(s:folder_filters) : ''
+
+    let foder_filter_patern = ''
+    if is_root
+        let foder_filter_patern = ex#pattern#last_words(s:folder_filters)
+    else
+        let foder_filter_patern = s:folder_filter_root_only ? '' : foder_filter_patern,
+    endif
     call s:build_tree( 
                 \ full_path_name, 
                 \ file_filter_pattern, 
