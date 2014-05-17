@@ -519,10 +519,6 @@ function exproject#confirm_select(modifier)
             silent exec editcmd.' '.fullpath
         endif
     endif
-
-    " TODO:
-    " " go back if needed
-    " call exUtility#OperateWindow ( s:exPJ_select_title, g:exPJ_close_when_selected, g:exPJ_backto_editbuf, 0 )
 endfunction
 
 " exproject#build_tree {{{2
