@@ -701,7 +701,7 @@ function exproject#refresh_current_folder()
     if is_root
         let foder_filter_patern = ex#pattern#last_words(s:folder_filters)
     else
-        let foder_filter_patern = s:folder_filter_root_only ? '' : foder_filter_patern,
+        let foder_filter_patern = s:folder_filter_root_only ? '' : foder_filter_patern
     endif
     call s:build_tree( 
                 \ full_path_name, 
