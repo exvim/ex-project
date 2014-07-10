@@ -109,7 +109,7 @@ function s:sort_filename( i1, i2 )
 endfunction
 
 " s:build_tree {{{2
-function s:build_tree( entry_path, file_pattern, folder_pattern, folder_include, filename_list )
+function s:build_tree( entry_path, file_pattern, file_ignore_pattern, folder_pattern, folder_include, filename_list )
     " show progress
     echon ex#short_message( 'processing: ' . fnamemodify(a:entry_path, ':p:.') ) . "\r"
 
@@ -134,8 +134,10 @@ function s:build_tree( entry_path, file_pattern, folder_pattern, folder_include,
                 if suffix == ''
                     let suffix = '__EMPTY__'
                 endif
+                let filename = fnamemodify ( file_list[list_idx], ':t' ) 
                 " move the file to the end of the list
-                if match ( suffix, a:file_pattern ) != -1 
+
+                if (a:file_ignore_pattern == "" || match ( filename, a:file_ignore_pattern) == -1) && match ( suffix, a:file_pattern ) != -1 
                     let file = remove(file_list,list_idx)
                     silent call add(file_list, file)
                 else " if not found file type in file filter
@@ -185,6 +187,7 @@ function s:build_tree( entry_path, file_pattern, folder_pattern, folder_include,
             if s:build_tree(
                         \ file_list[list_idx],
                         \ a:file_pattern,
+                        \ a:file_ignore_pattern, 
                         \ s:folder_filter_root_only ? '' : a:folder_pattern,
                         \ a:folder_include,
                         \ a:filename_list
@@ -538,9 +541,11 @@ function exproject#build_tree()
     let filename_list = []
     let file_filter_pattern = ex#pattern#last_words(s:file_filters)
     let foder_filter_patern = ex#pattern#last_words(s:folder_filters)
+    let file_ignore_pattern = ex#pattern#files(s:file_ignore_patterns)
     call s:build_tree( 
                 \ entry_dir, 
                 \ file_filter_pattern, 
+                \ file_ignore_pattern, 
                 \ foder_filter_patern, 
                 \ s:folder_filter_include,
                 \ filename_list )
@@ -696,16 +701,15 @@ function exproject#refresh_current_folder()
     " start broswing
     let filename_list = []
     let file_filter_pattern = ex#pattern#last_words(s:file_filters)
-
-    let foder_filter_patern = ''
-    if is_root
-        let foder_filter_patern = ex#pattern#last_words(s:folder_filters)
-    else
-        let foder_filter_patern = s:folder_filter_root_only ? '' : foder_filter_patern
+    let foder_filter_patern = ex#pattern#last_words(s:folder_filters)
+    let file_ignore_pattern = ex#pattern#files(s:file_ignore_patterns)
+    if !is_root && s:folder_filter_root_only
+        let foder_filter_patern = ''
     endif
     call s:build_tree( 
                 \ full_path_name, 
                 \ file_filter_pattern, 
+                \ file_ignore_pattern, 
                 \ foder_filter_patern,
                 \ s:folder_filter_include,
                 \ filename_list 
