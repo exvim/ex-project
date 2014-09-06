@@ -5,7 +5,6 @@ let s:file_filters = []
 let s:file_ignore_patterns = []
 let s:folder_filters = []
 let s:folder_filter_include = 1
-let s:folder_filter_root_only = 1
 
 let s:zoom_in = 0
 let s:keymap = {}
@@ -188,7 +187,7 @@ function s:build_tree( entry_path, file_pattern, file_ignore_pattern, folder_pat
                         \ file_list[list_idx],
                         \ a:file_pattern,
                         \ a:file_ignore_pattern, 
-                        \ s:folder_filter_root_only ? '' : a:folder_pattern,
+                        \ a:folder_pattern,
                         \ a:folder_include,
                         \ a:filename_list
                         \ ) == 1
@@ -540,13 +539,13 @@ function exproject#build_tree()
     " start tree building
     let filename_list = []
     let file_filter_pattern = ex#pattern#last_words(s:file_filters)
-    let foder_filter_patern = ex#pattern#last_words(s:folder_filters)
+    let folder_filter_patern = ex#pattern#last_words(s:folder_filters)
     let file_ignore_pattern = ex#pattern#files(s:file_ignore_patterns)
     call s:build_tree( 
                 \ entry_dir, 
                 \ file_filter_pattern, 
                 \ file_ignore_pattern, 
-                \ foder_filter_patern, 
+                \ folder_filter_patern, 
                 \ s:folder_filter_include,
                 \ filename_list )
 
@@ -701,16 +700,13 @@ function exproject#refresh_current_folder()
     " start broswing
     let filename_list = []
     let file_filter_pattern = ex#pattern#last_words(s:file_filters)
-    let foder_filter_patern = ex#pattern#last_words(s:folder_filters)
+    let folder_filter_patern = ex#pattern#last_words(s:folder_filters)
     let file_ignore_pattern = ex#pattern#files(s:file_ignore_patterns)
-    if !is_root && s:folder_filter_root_only
-        let foder_filter_patern = ''
-    endif
     call s:build_tree( 
                 \ full_path_name, 
                 \ file_filter_pattern, 
                 \ file_ignore_pattern, 
-                \ foder_filter_patern,
+                \ folder_filter_patern,
                 \ s:folder_filter_include,
                 \ filename_list 
                 \ ) 
@@ -756,11 +752,6 @@ endfunction
 " exproject#set_folder_filter_mode {{{2
 function exproject#set_folder_filter_mode( mode )
     let s:folder_filter_include = (a:mode == 'include')
-endfunction
-
-" exproject#set_folder_root_only {{{2
-function exproject#set_folder_root_only( root_only)
-    let s:folder_filter_root_only = (a:root_only == 'true')
 endfunction
 
 " exproject#newfile {{{2
