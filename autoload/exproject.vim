@@ -108,18 +108,24 @@ function s:sort_filename( i1, i2 )
 endfunction
 
 " s:build_tree {{{2
-function s:build_tree( entry_path, file_pattern, file_ignore_pattern, folder_pattern, folder_include, filename_list )
+function s:build_tree( entry_path, file_pattern, file_ignore_pattern, folder_pattern, folder_filter_include, included )
     " show progress
-    echon ex#short_message( 'processing: ' . fnamemodify(a:entry_path, ':p:.') ) . "\r"
+    " echon ex#short_message( 'processing: ' . fnamemodify(a:entry_path, ':p:.') ) . "\r"
 
     " get short_dir
     " let short_dir = strpart( a:entry_path, strridx(a:entry_path,'\')+1 )
+    let included = a:included
     let short_dir = fnamemodify( a:entry_path, ':t' )
+    let is_dir = isdirectory(a:entry_path)
+
+    let level_list_len = len(s:level_list)
+    let is_rootfile = (level_list_len == 1 && is_dir == 0) || level_list_len == 0
 
     " if directory
-    if isdirectory(a:entry_path) == 1
+    if is_dir == 1
         " split the first level to file_list
         let file_list = split(globpath(a:entry_path,'*'),'\n') " NOTE, globpath('.','.*') will show hidden folder
+        let inc_list = []
         silent call sort( file_list, function('s:sort_filename') )
 
         " sort and filter the list as we want (file|dir )
@@ -145,14 +151,8 @@ function s:build_tree( entry_path, file_pattern, file_ignore_pattern, folder_pat
                 let list_idx -= 1
 
             elseif a:folder_pattern != '' " remove not fit dirs
-                " if include && not found in pattner 
-                if a:folder_include 
-                    if match( file_list[list_idx], a:folder_pattern ) == -1
-                        silent call remove(file_list,list_idx)
-                        let list_idx -= 1
-                    endif
-                " if exclude && found in pattner 
-                else
+                " if folder filter mode is exclude 
+                if a:folder_filter_include == 0 
                     if match( file_list[list_idx], a:folder_pattern ) != -1
                         silent call remove(file_list,list_idx)
                         let list_idx -= 1
@@ -182,18 +182,31 @@ function s:build_tree( entry_path, file_pattern, file_ignore_pattern, folder_pat
             if list_idx != list_last
                 let s:level_list[len(s:level_list)-1].is_last = 0
             endif
-            " if it is empty
+
+            let child_included = a:included
+
+            " if folder filter mode is include and we are not included 
+            if a:folder_pattern != '' && a:folder_filter_include && child_included == 0
+                if match( file_list[list_idx], a:folder_pattern ) != -1
+                    let child_included = 1
+                endif
+            endif
+
+            " if the folder is empty or the folder/file is not added by filter
             if s:build_tree(
                         \ file_list[list_idx],
                         \ a:file_pattern,
                         \ a:file_ignore_pattern, 
                         \ a:folder_pattern,
-                        \ a:folder_include,
-                        \ a:filename_list
+                        \ a:folder_filter_include,
+                        \ child_included
                         \ ) == 1
                 silent call remove(file_list,list_idx)
                 let list_last = len(file_list)-1
+            else
+                let included = 1
             endif
+
             let list_idx -= 1
         endwhile
 
@@ -229,8 +242,13 @@ function s:build_tree( entry_path, file_pattern, file_ignore_pattern, folder_pat
         endif
     endfor
 
+    "
+    if is_rootfile == 0 && a:folder_pattern != '' && a:folder_filter_include == 1 && included == 0
+        return 1
+    endif
+
     " judge if it is a dir
-    if isdirectory(a:entry_path) == 0
+    if is_dir == 0
         " if file_end enter a new line for it
         if end_fold != ''
             let end_space = strpart(space,0,strridx(space,'-')-1)
@@ -243,13 +261,8 @@ function s:build_tree( entry_path, file_pattern, file_ignore_pattern, folder_pat
         let file_type = strpart( fnamemodify( short_dir, ":e" ), 0, 1 )
         " silent put! = space.'['.file_type.']'.short_dir . end_fold
         silent put! = space.short_dir . end_fold
-
-        " add file with full path as tag contents
-        let filename_path = ex#path#translate(fnamemodify(a:entry_path,':.'),'unix')
-        silent call add ( a:filename_list, short_dir."\t".'../'.filename_path."\t1" )
         return 0
     else
-
         "silent put = strpart(space, 0, strridx(space,'\|-')+1)
         if len(file_list) == 0 " if it is a empty directory
             if end_fold == ''
@@ -537,7 +550,6 @@ function exproject#build_tree()
     silent exec '1,$d _'
 
     " start tree building
-    let filename_list = []
     let file_filter_pattern = ex#pattern#last_words(s:file_filters)
     let folder_filter_patern = ex#pattern#last_words(s:folder_filters)
     let file_ignore_pattern = ex#pattern#files(s:file_ignore_patterns)
@@ -547,7 +559,8 @@ function exproject#build_tree()
                 \ file_ignore_pattern, 
                 \ folder_filter_patern, 
                 \ s:folder_filter_include,
-                \ filename_list )
+                \ 0,
+                \ )
 
     silent keepjumps normal! gg
 
@@ -698,7 +711,6 @@ function exproject#refresh_current_folder()
     silent exec 'normal! "_2dd'
 
     " start broswing
-    let filename_list = []
     let file_filter_pattern = ex#pattern#last_words(s:file_filters)
     let folder_filter_patern = ex#pattern#last_words(s:folder_filters)
     let file_ignore_pattern = ex#pattern#files(s:file_ignore_patterns)
@@ -708,7 +720,7 @@ function exproject#refresh_current_folder()
                 \ file_ignore_pattern, 
                 \ folder_filter_patern,
                 \ s:folder_filter_include,
-                \ filename_list 
+                \ 1
                 \ ) 
 
     " at the end, we need to rename the folder as simple one rename the folder
