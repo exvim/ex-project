@@ -24,9 +24,10 @@ syntax match ex_pj_ft_html '.*\.\(html\|xml\|json\)\>' contained
 syntax match ex_pj_ft_style '.*\.\(css\|styl\|less\|sass\)\>' contained
 
 syntax match ex_pj_ft_exvim '.*\.\(exvim\|vimentry\|vimproject\)\>' contained
-syntax match ex_pj_ft_gulpfile 'gulpfile.js' contained
-syntax match ex_pj_ft_package_json 'package.json' contained
-syntax match ex_pj_ft_bower_json 'bower.json' contained
+syntax match ex_pj_ft_gulpfile 'gulpfile\.\(js\|coffee\)' contained
+syntax match ex_pj_ft_gruntfile 'gruntfile\.\(js\|coffee\)' contained
+syntax match ex_pj_ft_package_json 'package\.json' contained
+syntax match ex_pj_ft_bower_json 'bower\.json' contained
 syntax match ex_pj_ft_error '.*\.\(err\)\>' contained
 
 syntax cluster ex_pj_special_files contains=
